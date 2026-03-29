@@ -2,11 +2,11 @@
 
 import { useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { AddRecipeForm } from "./AddRecipeForm";
-import { RecipeCard } from "./RecipeCard";
-import { RecipeRow } from "./RecipeRow";
-import { ViewToggle, type ViewMode } from "./ViewToggle";
-import { Navbar } from "./Navbar";
+import { AddRecipeForm } from "@/components/organisms/AddRecipeForm";
+import { RecipeCard } from "@/components/organisms/RecipeCard";
+import { RecipeRow } from "@/components/organisms/RecipeRow";
+import { ViewToggle, type ViewMode } from "@/components/molecules/ViewToggle";
+import { Navbar } from "@/components/organisms/Navbar";
 import type { Recipe } from "@/lib/types";
 
 interface RecipesClientProps {
@@ -47,7 +47,6 @@ export function RecipesClient({ initialRecipes }: RecipesClientProps) {
     if (data) setRecipes(data as Recipe[]);
   }
 
-  // Store selected IDs in sessionStorage so the shopping list page can read them
   function handleGoToShoppingList() {
     sessionStorage.setItem("selected_recipe_ids", JSON.stringify([...selected]));
   }
@@ -65,7 +64,9 @@ export function RecipesClient({ initialRecipes }: RecipesClientProps) {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-stone-900">
               Your recipes
-              <span className="text-stone-400 font-normal text-base ml-2">({recipes.length})</span>
+              <span className="text-stone-400 font-normal text-base ml-2">
+                ({recipes.length})
+              </span>
             </h2>
             <div className="flex items-center gap-3">
               {selected.size > 0 && (
