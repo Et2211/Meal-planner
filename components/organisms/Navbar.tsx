@@ -1,8 +1,9 @@
 "use client";
 
+import { ChefHat, ClipboardList, LogOut, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChefHat, ShoppingCart, LogOut } from "lucide-react";
+
 import { createClient } from "@/lib/supabase/client";
 
 interface NavbarProps {
@@ -10,7 +11,7 @@ interface NavbarProps {
   onShoppingListClick?: () => void;
 }
 
-export function Navbar({ selectedCount, onShoppingListClick }: NavbarProps) {
+export const Navbar = ({ selectedCount, onShoppingListClick }: NavbarProps) => {
   const router = useRouter();
 
   async function handleSignOut() {
@@ -29,6 +30,13 @@ export function Navbar({ selectedCount, onShoppingListClick }: NavbarProps) {
         </Link>
 
         <div className="flex items-center gap-2">
+          <Link
+            href="/shopping-lists"
+            className="p-2 text-stone-500 hover:text-stone-700 hover:bg-stone-100 rounded-lg transition"
+            title="Saved shopping lists"
+          >
+            <ClipboardList size={18} />
+          </Link>
           {selectedCount > 0 && (
             <Link
               href="/shopping-list"
