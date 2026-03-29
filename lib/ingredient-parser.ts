@@ -1,21 +1,21 @@
 import Fraction from "fraction.js";
+
 import type { Ingredient, ShoppingListItem } from "./types";
 
 // ─── Imperial → Metric conversion ────────────────────────────────────────────
-// Volume conversions to ml
+// Cooking volume units used for both solids and liquids — keep as-is
+const COOKING_VOLUME_UNITS = new Set([
+  "tsp", "teaspoon", "teaspoons",
+  "tbsp", "tablespoon", "tablespoons",
+  "cup", "cups",
+]);
+
+// Liquid-only volume conversions to ml
 const VOLUME_TO_ML: Record<string, number> = {
-  tsp: 5,
-  teaspoon: 5,
-  teaspoons: 5,
-  tbsp: 15,
-  tablespoon: 15,
-  tablespoons: 15,
   "fl oz": 30,
   "fluid oz": 30,
   "fluid ounce": 30,
   "fluid ounces": 30,
-  cup: 240,
-  cups: 240,
   pt: 473,
   pint: 473,
   pints: 473,
@@ -54,6 +54,11 @@ function toMetric(quantity: number, unit: string): { quantity: number; unit: str
     return { quantity, unit: normalizeMetricUnit(normalized) };
   }
 
+  // tsp/tbsp/cup used for solids and liquids — keep the original unit
+  if (COOKING_VOLUME_UNITS.has(normalized)) {
+    return { quantity, unit: normalized };
+  }
+
   if (normalized in VOLUME_TO_ML) {
     const ml = quantity * VOLUME_TO_ML[normalized];
     if (ml >= 1000) {
@@ -63,11 +68,11 @@ function toMetric(quantity: number, unit: string): { quantity: number; unit: str
   }
 
   if (normalized in WEIGHT_TO_G) {
-    const g = quantity * WEIGHT_TO_G[normalized];
-    if (g >= 1000) {
-      return { quantity: round(g / 1000, 3), unit: "kg" };
+    const grams = quantity * WEIGHT_TO_G[normalized];
+    if (grams >= 1000) {
+      return { quantity: round(grams / 1000, 3), unit: "kg" };
     }
-    return { quantity: round(g, 1), unit: "g" };
+    return { quantity: round(grams, 1), unit: "g" };
   }
 
   // Unknown unit — return as-is
@@ -95,16 +100,16 @@ const UNICODE_FRACTIONS: Record<string, string> = {
   "⅙": "1/6", "⅚": "5/6", "⅛": "1/8", "⅜": "3/8", "⅝": "5/8", "⅞": "7/8",
 };
 
-function normalizeQuantityStr(s: string): string {
-  let out = s;
+function normalizeQuantityStr(str: string): string {
+  let out = str;
   for (const [unicode, ascii] of Object.entries(UNICODE_FRACTIONS)) {
     out = out.replace(new RegExp(unicode, "g"), ascii);
   }
   return out;
 }
 
-function parseQuantity(s: string): number | null {
-  const normalized = normalizeQuantityStr(s).trim();
+function parseQuantity(str: string): number | null {
+  const normalized = normalizeQuantityStr(str).trim();
 
   // "1 1/2" or "1½"
   const mixed = normalized.match(/^(\d+)\s+(\d+\/\d+)$/);
@@ -124,13 +129,13 @@ function parseQuantity(s: string): number | null {
 
 // ─── Known units for regex matching ──────────────────────────────────────────
 const ALL_UNITS = [
+  ...Array.from(COOKING_VOLUME_UNITS),
   ...Object.keys(VOLUME_TO_ML),
   ...Object.keys(WEIGHT_TO_G),
   ...Array.from(METRIC_UNITS),
-  "fl oz", "fluid oz", "fluid ounce", "fluid ounces",
-].sort((a, b) => b.length - a.length); // longest first for greedy match
+].sort((unitA, unitB) => unitB.length - unitA.length); // longest first for greedy match
 
-const UNIT_PATTERN = ALL_UNITS.map((u) => u.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
+const UNIT_PATTERN = ALL_UNITS.map((unit) => unit.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
 
 // Main ingredient parse regex: optional quantity, optional unit, then name
 const INGREDIENT_RE = new RegExp(
@@ -223,7 +228,7 @@ export function buildShoppingList(ingredientArrays: Ingredient[][]): ShoppingLis
           name,
           quantity: round(quantity, 3),
           unit,
-          entries: items.map((i) => i.raw),
+          entries: items.map((item) => item.raw),
         });
       }
     } else {
@@ -236,7 +241,7 @@ export function buildShoppingList(ingredientArrays: Ingredient[][]): ShoppingLis
     }
   }
 
-  return result.sort((a, b) => a.name.localeCompare(b.name));
+  return result.sort((itemA, itemB) => itemA.name.localeCompare(itemB.name));
 }
 
 export function formatShoppingItem(item: ShoppingListItem): string {

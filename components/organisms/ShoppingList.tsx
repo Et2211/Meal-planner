@@ -86,20 +86,27 @@ export const ShoppingList = () => {
   async function handleSave() {
     setSaving(true);
     const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { setSaving(false); return; }
     const payload = {
+      user_id: user.id,
       name: listName,
       items: entries.map(({ label, checked, custom }) => ({ label, checked, custom })),
       recipe_ids: recipeIds,
     };
 
     if (savedId) {
-      await supabase.from("shopping_lists").update(payload).eq("id", savedId);
+      const { error } = await supabase.from("shopping_lists").update(payload).eq("id", savedId);
+      // eslint-disable-next-line no-console
+      if (error) { console.error("shopping_lists update failed:", error.message); setSaving(false); return; }
     } else {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("shopping_lists")
         .insert(payload)
         .select("id")
         .single();
+      // eslint-disable-next-line no-console
+      if (error) { console.error("shopping_lists insert failed:", error.message); setSaving(false); return; }
       if (data) setSavedId(data.id as string);
     }
 
