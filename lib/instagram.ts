@@ -1,19 +1,33 @@
+import { execFile } from "child_process";
+import path from "path";
+import { promisify } from "util";
+
 import { GoogleGenAI } from "@google/genai";
-import youtubeDl from "youtube-dl-exec";
 
 import { parseIngredient } from "./ingredient-parser";
 import { scrapeRecipeFromUrl } from "./recipe-scraper";
 import { getCachedScrape, setCachedScrape } from "./scrape-cache";
 import type { ScrapedRecipe } from "./types";
 
+const execFileAsync = promisify(execFile);
 const URL_REGEX = /https?:\/\/[^\s)>\]"]+/g;
 
-function fetchInstagramMeta(url: string) {
-  return youtubeDl(url, {
-    dumpSingleJson: true,
-    noPlaylist: true,
-    noWarnings: true,
-  });
+// Use youtube-dl-exec's managed binary via execFile so paths with spaces are handled correctly
+const ytDlpBin = path.join(process.cwd(), "node_modules", "youtube-dl-exec", "bin", "yt-dlp");
+
+interface YtDlpMeta {
+  title?: string;
+  description?: string;
+  thumbnail?: string;
+}
+
+async function fetchInstagramMeta(url: string): Promise<YtDlpMeta> {
+  const { stdout } = await execFileAsync(
+    ytDlpBin,
+    ["--dump-single-json", "--no-playlist", "--no-warnings", url],
+    { timeout: 30000 }
+  );
+  return JSON.parse(stdout);
 }
 
 interface GeminiRecipe {
@@ -59,7 +73,7 @@ ${caption}`;
   const parsed = JSON.parse(json);
 
   if ("error" in parsed) {
-    throw new Error(parsed.error as string);
+    throw new Error(String(parsed.error));
   }
 
   return {
@@ -73,11 +87,7 @@ export async function scrapeInstagramReel(url: string): Promise<ScrapedRecipe> {
   const cached = await getCachedScrape(url);
   if (cached) return cached;
 
-  const result = await fetchInstagramMeta(url);
-  if (typeof result === "string") {
-    throw new Error("Unexpected response fetching post metadata");
-  }
-  const meta = result;
+  const meta = await fetchInstagramMeta(url);
 
   const caption = meta.description || "";
   const fallbackTitle = meta.title || "Instagram Recipe";

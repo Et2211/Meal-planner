@@ -36,9 +36,12 @@ create policy "Users can delete own recipes"
   on public.recipes for delete
   using (auth.uid() = user_id);
 
--- Scrape cache: shared cache for social media URL scrapes (no RLS — not user-specific)
+-- Scrape cache: shared cache for social media URL scrapes
+-- No RLS — not user-specific, no sensitive data
 create table if not exists public.scrape_cache (
   url        text primary key,
   recipe     jsonb not null,
   created_at timestamptz not null default now()
 );
+
+alter table public.scrape_cache disable row level security;

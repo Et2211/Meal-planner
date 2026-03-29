@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+
 import type { ScrapedRecipe } from "./types";
 
 function getClient() {
@@ -18,7 +19,11 @@ export async function getCachedScrape(url: string): Promise<ScrapedRecipe | null
 }
 
 export async function setCachedScrape(url: string, recipe: ScrapedRecipe): Promise<void> {
-  await getClient()
+  const { error } = await getClient()
     .from("scrape_cache")
     .upsert({ url, recipe });
+  if (error) {
+    // eslint-disable-next-line no-console
+    console.error("scrape_cache write failed:", error.message);
+  }
 }
