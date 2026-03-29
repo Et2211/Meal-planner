@@ -23,6 +23,9 @@
 *.tsbuildinfo
 next-env.d.ts
 
+# yt-dlp standalone binary (downloaded at build time for Vercel)
+/bin/yt-dlp
+
 # IDEs and editors
 .claude
 .vscode

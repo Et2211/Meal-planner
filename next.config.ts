@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
     ],
   },
   outputFileTracingIncludes: {
-    "/api/scrape-recipe": ["./node_modules/youtube-dl-exec/bin/yt-dlp"],
+    "/api/scrape-recipe": ["./bin/yt-dlp"],
   },
 };
 
