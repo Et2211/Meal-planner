@@ -13,7 +13,7 @@ const sizes: Record<Size, string> = {
   lg: "h-12 w-12 border-[3px]",
 };
 
-export function Spinner({ size = "md", className }: SpinnerProps) {
+export const Spinner = ({ size = "md", className }: SpinnerProps) => {
   return (
     <div
       className={cn(

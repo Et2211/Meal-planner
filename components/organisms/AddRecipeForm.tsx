@@ -1,11 +1,12 @@
 "use client";
 
+import { Link as LinkIcon, Loader2, Plus } from "lucide-react";
 import { useState } from "react";
-import { Loader2, Link as LinkIcon, Plus } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
+
 import { Button } from "@/components/atoms/Button";
 import { Input } from "@/components/atoms/Input";
 import { RecipeScrapedPreview } from "@/components/molecules/RecipeScrapedPreview";
+import { createClient } from "@/lib/supabase/client";
 import type { ScrapedRecipe } from "@/lib/types";
 
 interface AddRecipeFormProps {
@@ -14,7 +15,7 @@ interface AddRecipeFormProps {
 
 type Step = "idle" | "loading" | "preview" | "saving";
 
-export function AddRecipeForm({ onAdded }: AddRecipeFormProps) {
+export const AddRecipeForm = ({ onAdded }: AddRecipeFormProps) => {
   const [url, setUrl] = useState("");
   const [step, setStep] = useState<Step>("idle");
   const [scraped, setScraped] = useState<ScrapedRecipe | null>(null);

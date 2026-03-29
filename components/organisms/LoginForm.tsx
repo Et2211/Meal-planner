@@ -1,15 +1,16 @@
 "use client";
 
-import { useState } from "react";
 import { Loader2 } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
+import { useState } from "react";
+
 import { Button } from "@/components/atoms/Button";
 import { FormField } from "@/components/molecules/FormField";
+import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
 type Mode = "login" | "signup";
 
-export function LoginForm() {
+export const LoginForm = () => {
   const [mode, setMode] = useState<Mode>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -142,7 +143,7 @@ export function LoginForm() {
   );
 }
 
-function GoogleIcon() {
+const GoogleIcon = () => {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24">
       <path

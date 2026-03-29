@@ -1,11 +1,12 @@
 "use client";
 
+import { ExternalLink, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { ExternalLink, Trash2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+
 import { RoundCheckbox } from "@/components/atoms/RoundCheckbox";
 import type { Recipe } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 interface RecipeRowProps {
   recipe: Recipe;
@@ -14,7 +15,7 @@ interface RecipeRowProps {
   onDelete: (id: string) => void;
 }
 
-export function RecipeRow({ recipe, selected, onToggle, onDelete }: RecipeRowProps) {
+export const RecipeRow = ({ recipe, selected, onToggle, onDelete }: RecipeRowProps) => {
   return (
     <div
       className={cn(

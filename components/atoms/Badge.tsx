@@ -1,5 +1,6 @@
-import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
+
+import { cn } from "@/lib/utils";
 
 type Variant = "default" | "brand";
 
@@ -14,7 +15,7 @@ const variants: Record<Variant, string> = {
   brand: "bg-brand-50 text-brand-700 border border-brand-100",
 };
 
-export function Badge({ children, variant = "default", className }: BadgeProps) {
+export const Badge = ({ children, variant = "default", className }: BadgeProps) => {
   return (
     <span
       className={cn("text-xs px-2.5 py-0.5 rounded-full", variants[variant], className)}
