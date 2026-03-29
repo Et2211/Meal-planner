@@ -30,3 +30,18 @@ export interface ShoppingListItem {
   unit: string | null;
   entries: string[];
 }
+
+export interface SavedListItem {
+  label: string;
+  checked: boolean;
+  custom: boolean;
+}
+
+export interface SavedShoppingList {
+  id: string;
+  user_id: string;
+  name: string;
+  items: SavedListItem[];
+  recipe_ids: string[];
+  created_at: string;
+}
