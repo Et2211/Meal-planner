@@ -13,8 +13,9 @@ A recipe collection web app. Users paste a recipe URL, the app scrapes its ingre
 - **Framework**: Next.js 16 (App Router, TypeScript)
 - **Styling**: Tailwind CSS
 - **Auth + Database**: Supabase (Postgres + Row Level Security)
-- **Recipe Scraping**: Cheerio — parses `schema.org/Recipe` JSON-LD from recipe page HTML
+- **Recipe Scraping**: Cheerio — parses `schema.org/Recipe` JSON-LD from recipe page HTML; Instagram Reels via `yt-dlp` + Gemini
 - **Ingredient Parsing**: `fraction.js` for fractional quantities; custom imperial→metric converter
+- **AI**: Google Gemini 1.5 Flash (`@google/genai`) — extracts recipe data from Instagram captions
 
 ## Project Structure
 
@@ -75,6 +76,15 @@ Single table: `recipes`
 RLS policies restrict all operations to `auth.uid() = user_id`.
 
 ## Key Behaviours
+
+### Instagram Reels Scraping
+
+- Detected when URL hostname is `instagram.com`
+- Uses `yt-dlp` (system binary, must be installed via `brew install yt-dlp`) to fetch post metadata and caption
+- Passes the caption to Gemini 1.5 Flash to extract structured recipe data (title, ingredients, instructions)
+- Returns a `ScrapedRecipe` in the same format as the standard scraper — preview → save flow is unchanged
+- Requires `GEMINI_API_KEY` env var; optional `YT_DLP_PATH` to override the binary location
+- Captions without recipe content surface an error to the user
 
 ### Recipe Scraping
 - Fetches the URL server-side with a browser User-Agent
