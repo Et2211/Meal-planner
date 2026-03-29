@@ -1,9 +1,14 @@
 import { execFile } from "child_process";
 import { promisify } from "util";
+
 import { GoogleGenAI } from "@google/genai";
+
 import { parseIngredient } from "./ingredient-parser";
+import { scrapeRecipeFromUrl } from "./recipe-scraper";
 import { getCachedScrape, setCachedScrape } from "./scrape-cache";
 import type { ScrapedRecipe } from "./types";
+
+const URL_REGEX = /https?:\/\/[^\s)>\]"]+/g;
 
 const execFileAsync = promisify(execFile);
 
@@ -89,15 +94,33 @@ export async function scrapeInstagramReel(url: string): Promise<ScrapedRecipe> {
     throw new Error("This post has no caption. Cannot extract a recipe.");
   }
 
-  const recipe = await parseRecipeWithGemini(caption, fallbackTitle);
+  let scraped: ScrapedRecipe;
 
-  const scraped: ScrapedRecipe = {
-    title: recipe.title,
-    source_url: url,
-    image_url: meta.thumbnail ?? null,
-    ingredients: recipe.ingredients.map((raw) => parseIngredient(raw)),
-    instructions: recipe.instructions,
-  };
+  try {
+    const recipe = await parseRecipeWithGemini(caption, fallbackTitle);
+    scraped = {
+      title: recipe.title,
+      source_url: url,
+      image_url: meta.thumbnail ?? null,
+      ingredients: recipe.ingredients.map((raw) => parseIngredient(raw)),
+      instructions: recipe.instructions,
+    };
+  } catch (geminiErr) {
+    // Caption has no recipe — try any URLs mentioned in the caption
+    const captionUrls = caption.match(URL_REGEX) ?? [];
+    for (const linkedUrl of captionUrls) {
+      try {
+        scraped = await scrapeRecipeFromUrl(linkedUrl);
+        scraped = { ...scraped, source_url: url, image_url: scraped.image_url ?? meta.thumbnail ?? null };
+        break;
+      } catch {
+        // try next URL
+      }
+    }
+    if (!scraped!) {
+      throw geminiErr;
+    }
+  }
 
   await setCachedScrape(url, scraped);
   return scraped;
