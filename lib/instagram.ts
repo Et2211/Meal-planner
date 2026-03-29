@@ -2,6 +2,7 @@ import { execFile } from "child_process";
 import { promisify } from "util";
 import { GoogleGenAI } from "@google/genai";
 import { parseIngredient } from "./ingredient-parser";
+import { getCachedScrape, setCachedScrape } from "./scrape-cache";
 import type { ScrapedRecipe } from "./types";
 
 const execFileAsync = promisify(execFile);
@@ -76,6 +77,9 @@ ${caption}`;
 }
 
 export async function scrapeInstagramReel(url: string): Promise<ScrapedRecipe> {
+  const cached = await getCachedScrape(url);
+  if (cached) return cached;
+
   const meta = await fetchInstagramMeta(url);
 
   const caption = meta.description || "";
@@ -87,13 +91,16 @@ export async function scrapeInstagramReel(url: string): Promise<ScrapedRecipe> {
 
   const recipe = await parseRecipeWithGemini(caption, fallbackTitle);
 
-  return {
+  const scraped: ScrapedRecipe = {
     title: recipe.title,
     source_url: url,
     image_url: meta.thumbnail ?? null,
     ingredients: recipe.ingredients.map((raw) => parseIngredient(raw)),
     instructions: recipe.instructions,
   };
+
+  await setCachedScrape(url, scraped);
+  return scraped;
 }
 
 export function isInstagramUrl(url: string): boolean {
