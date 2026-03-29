@@ -12,8 +12,13 @@ import type { ScrapedRecipe } from "./types";
 const execFileAsync = promisify(execFile);
 const URL_REGEX = /https?:\/\/[^\s)>\]"]+/g;
 
-// Use youtube-dl-exec's managed binary via execFile so paths with spaces are handled correctly
-const ytDlpBin = path.join(process.cwd(), "node_modules", "youtube-dl-exec", "bin", "yt-dlp");
+// On Linux (Vercel): use the standalone binary downloaded at build time
+// On macOS/other: fall back to the system yt-dlp (installed via Homebrew)
+const ytDlpBin =
+  process.env.YT_DLP_PATH ||
+  (process.platform === "linux"
+    ? path.join(process.cwd(), "bin", "yt-dlp")
+    : "yt-dlp");
 
 interface YtDlpMeta {
   title?: string;

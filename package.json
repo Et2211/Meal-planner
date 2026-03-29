@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "postinstall": "node scripts/download-yt-dlp.mjs"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,md,css,scss}": [
@@ -26,8 +27,7 @@
     "next": "^16.2.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "tailwind-merge": "^2.5.5",
-    "youtube-dl-exec": "^3.1.4"
+    "tailwind-merge": "^2.5.5"
   },
   "devDependencies": {
     "@types/node": "^20",
