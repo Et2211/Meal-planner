@@ -4,7 +4,14 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, Copy, Check, ShoppingCart } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { buildShoppingList, formatShoppingItem, shoppingListToText } from "@/lib/ingredient-parser";
+import {
+  buildShoppingList,
+  formatShoppingItem,
+  shoppingListToText,
+} from "@/lib/ingredient-parser";
+import { Button } from "@/components/atoms/Button";
+import { Badge } from "@/components/atoms/Badge";
+import { Spinner } from "@/components/atoms/Spinner";
 import type { Recipe, ShoppingListItem } from "@/lib/types";
 
 export function ShoppingList() {
@@ -17,17 +24,24 @@ export function ShoppingList() {
     async function load() {
       const supabase = createClient();
       const stored = sessionStorage.getItem("selected_recipe_ids");
-      if (!stored) { setLoading(false); return; }
+      if (!stored) {
+        setLoading(false);
+        return;
+      }
 
       let ids: string[];
-      try { ids = JSON.parse(stored); } catch { setLoading(false); return; }
-      if (!ids.length) { setLoading(false); return; }
+      try {
+        ids = JSON.parse(stored);
+      } catch {
+        setLoading(false);
+        return;
+      }
+      if (!ids.length) {
+        setLoading(false);
+        return;
+      }
 
-      const { data } = await supabase
-        .from("recipes")
-        .select("*")
-        .in("id", ids);
-
+      const { data } = await supabase.from("recipes").select("*").in("id", ids);
       if (data && data.length > 0) {
         const loaded = data as Recipe[];
         setRecipes(loaded);
@@ -36,12 +50,11 @@ export function ShoppingList() {
       setLoading(false);
     }
     load();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function handleCopy() {
-    const text = shoppingListToText(items);
-    await navigator.clipboard.writeText(text);
+    await navigator.clipboard.writeText(shoppingListToText(items));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
@@ -49,7 +62,7 @@ export function ShoppingList() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-2 border-brand-500 border-t-transparent" />
+        <Spinner size="md" />
       </div>
     );
   }
@@ -71,10 +84,7 @@ export function ShoppingList() {
             </span>
           </div>
           {items.length > 0 && (
-            <button
-              onClick={handleCopy}
-              className="flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg transition border border-stone-300 hover:bg-stone-50 text-stone-700"
-            >
+            <Button variant="secondary" size="sm" onClick={handleCopy}>
               {copied ? (
                 <>
                   <Check size={14} className="text-green-500" />
@@ -86,7 +96,7 @@ export function ShoppingList() {
                   Copy list
                 </>
               )}
-            </button>
+            </Button>
           )}
         </div>
       </header>
@@ -107,7 +117,6 @@ export function ShoppingList() {
           </div>
         ) : (
           <>
-            {/* Recipe summary */}
             {recipes.length > 0 && (
               <div className="mb-6">
                 <p className="text-sm text-stone-500 mb-2">
@@ -115,38 +124,29 @@ export function ShoppingList() {
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {recipes.map((r) => (
-                    <span
-                      key={r.id}
-                      className="text-xs bg-brand-50 text-brand-700 border border-brand-100 px-2.5 py-1 rounded-full"
-                    >
+                    <Badge key={r.id} variant="brand">
                       {r.title}
-                    </span>
+                    </Badge>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Shopping list */}
             <div className="bg-white border border-stone-200 rounded-2xl overflow-hidden">
               <div className="divide-y divide-stone-100">
                 {items.map((item, i) => (
-                  <div key={i} className="flex items-start justify-between px-4 py-3 gap-3">
-                    <div className="flex items-start gap-2.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-brand-400 flex-shrink-0 mt-2" />
-                      <span className="text-sm text-stone-800 capitalize">
-                        {formatShoppingItem(item)}
-                      </span>
-                    </div>
+                  <div key={i} className="flex items-start px-4 py-3 gap-2.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-brand-400 flex-shrink-0 mt-2" />
+                    <span className="text-sm text-stone-800 capitalize">
+                      {formatShoppingItem(item)}
+                    </span>
                   </div>
                 ))}
               </div>
             </div>
 
             <div className="mt-4 flex justify-center">
-              <button
-                onClick={handleCopy}
-                className="flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-medium px-6 py-2.5 rounded-xl transition"
-              >
+              <Button onClick={handleCopy} className="px-6">
                 {copied ? (
                   <>
                     <Check size={15} />
@@ -158,7 +158,7 @@ export function ShoppingList() {
                     Copy list to clipboard
                   </>
                 )}
-              </button>
+              </Button>
             </div>
           </>
         )}

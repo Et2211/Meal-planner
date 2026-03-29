@@ -108,7 +108,7 @@ Copy `.env.local.example` to `.env.local`:
 
 ```
 NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=your-supabase-anon-key
 ```
 
 ## Local Development

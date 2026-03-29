@@ -1,4 +1,4 @@
-import { LoginForm } from "@/components/LoginForm";
+import { LoginForm } from "@/components/organisms/LoginForm";
 import { ChefHat } from "lucide-react";
 
 export default function LoginPage() {

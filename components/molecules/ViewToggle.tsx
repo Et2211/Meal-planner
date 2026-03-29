@@ -17,7 +17,9 @@ export function ViewToggle({ view, onChange }: ViewToggleProps) {
         onClick={() => onChange("grid")}
         className={cn(
           "p-1.5 rounded-md transition",
-          view === "grid" ? "bg-white shadow-sm text-stone-900" : "text-stone-500 hover:text-stone-700"
+          view === "grid"
+            ? "bg-white shadow-sm text-stone-900"
+            : "text-stone-500 hover:text-stone-700"
         )}
         title="Grid view"
       >
@@ -27,7 +29,9 @@ export function ViewToggle({ view, onChange }: ViewToggleProps) {
         onClick={() => onChange("list")}
         className={cn(
           "p-1.5 rounded-md transition",
-          view === "list" ? "bg-white shadow-sm text-stone-900" : "text-stone-500 hover:text-stone-700"
+          view === "list"
+            ? "bg-white shadow-sm text-stone-900"
+            : "text-stone-500 hover:text-stone-700"
         )}
         title="List view"
       >
