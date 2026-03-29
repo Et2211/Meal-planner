@@ -1,7 +1,5 @@
-import { execFile } from "child_process";
-import { promisify } from "util";
-
 import { GoogleGenAI } from "@google/genai";
+import youtubeDl from "youtube-dl-exec";
 
 import { parseIngredient } from "./ingredient-parser";
 import { scrapeRecipeFromUrl } from "./recipe-scraper";
@@ -10,22 +8,12 @@ import type { ScrapedRecipe } from "./types";
 
 const URL_REGEX = /https?:\/\/[^\s)>\]"]+/g;
 
-const execFileAsync = promisify(execFile);
-
-interface YtDlpMeta {
-  title?: string;
-  description?: string;
-  thumbnail?: string;
-}
-
-async function fetchInstagramMeta(url: string): Promise<YtDlpMeta> {
-  const ytDlpPath = process.env.YT_DLP_PATH || "yt-dlp";
-  const { stdout } = await execFileAsync(
-    ytDlpPath,
-    ["--dump-json", "--no-playlist", "--no-warnings", url],
-    { timeout: 30000 }
-  );
-  return JSON.parse(stdout) as YtDlpMeta;
+function fetchInstagramMeta(url: string) {
+  return youtubeDl(url, {
+    dumpSingleJson: true,
+    noPlaylist: true,
+    noWarnings: true,
+  });
 }
 
 interface GeminiRecipe {
@@ -85,7 +73,11 @@ export async function scrapeInstagramReel(url: string): Promise<ScrapedRecipe> {
   const cached = await getCachedScrape(url);
   if (cached) return cached;
 
-  const meta = await fetchInstagramMeta(url);
+  const result = await fetchInstagramMeta(url);
+  if (typeof result === "string") {
+    throw new Error("Unexpected response fetching post metadata");
+  }
+  const meta = result;
 
   const caption = meta.description || "";
   const fallbackTitle = meta.title || "Instagram Recipe";
