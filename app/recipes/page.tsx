@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+
 import { RecipesClient } from "@/components/templates/RecipesClient";
+import { createClient } from "@/lib/supabase/server";
 import type { Recipe } from "@/lib/types";
 
 export default async function RecipesPage() {

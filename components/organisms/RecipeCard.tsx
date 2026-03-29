@@ -1,11 +1,12 @@
 "use client";
 
+import { ExternalLink, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { ExternalLink, Trash2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+
 import { RoundCheckbox } from "@/components/atoms/RoundCheckbox";
 import type { Recipe } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -14,7 +15,7 @@ interface RecipeCardProps {
   onDelete: (id: string) => void;
 }
 
-export function RecipeCard({ recipe, selected, onToggle, onDelete }: RecipeCardProps) {
+export const RecipeCard = ({ recipe, selected, onToggle, onDelete }: RecipeCardProps) => {
   return (
     <div
       className={cn(

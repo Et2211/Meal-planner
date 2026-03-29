@@ -1,13 +1,14 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import type { InputHTMLAttributes, ReactNode } from "react";
+
+import { cn } from "@/lib/utils";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   leadingIcon?: ReactNode;
 }
 
-export function Input({ leadingIcon, className, ...props }: InputProps) {
+export const Input = ({ leadingIcon, className, ...props }: InputProps) => {
   if (leadingIcon) {
     return (
       <div className="flex items-center gap-2 bg-white border border-stone-300 rounded-xl px-3 py-2.5 focus-within:ring-2 focus-within:ring-brand-500 focus-within:border-transparent transition">

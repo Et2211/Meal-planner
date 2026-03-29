@@ -1,13 +1,14 @@
 "use client";
 
-import { Input } from "@/components/atoms/Input";
 import type { InputHTMLAttributes } from "react";
+
+import { Input } from "@/components/atoms/Input";
 
 interface FormFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
 }
 
-export function FormField({ label, id, ...props }: FormFieldProps) {
+export const FormField = ({ label, id, ...props }: FormFieldProps) => {
   const fieldId = id ?? label.toLowerCase().replace(/\s+/g, "-");
   return (
     <div>

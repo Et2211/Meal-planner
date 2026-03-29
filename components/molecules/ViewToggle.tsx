@@ -1,6 +1,7 @@
 "use client";
 
 import { LayoutGrid, List } from "lucide-react";
+
 import { cn } from "@/lib/utils";
 
 export type ViewMode = "grid" | "list";
@@ -10,7 +11,7 @@ interface ViewToggleProps {
   onChange: (view: ViewMode) => void;
 }
 
-export function ViewToggle({ view, onChange }: ViewToggleProps) {
+export const ViewToggle = ({ view, onChange }: ViewToggleProps) => {
   return (
     <div className="flex items-center bg-stone-100 rounded-lg p-0.5">
       <button

@@ -14,13 +14,10 @@ const binDir = path.join(projectRoot, "bin");
 const binaryPath = path.join(binDir, "yt-dlp");
 
 if (process.platform !== "linux") {
-  console.log("Skipping yt-dlp download (non-Linux platform)");
   process.exit(0);
 }
 
 if (existsSync(binaryPath)) {
-  // eslint-disable-next-line no-console
-  console.log("yt-dlp binary already present, skipping download");
   process.exit(0);
 }
 
@@ -28,17 +25,14 @@ if (!existsSync(binDir)) {
   mkdirSync(binDir, { recursive: true });
 }
 
-// yt-dlp_linux is the standalone binary — no Python dependency
+// yt-dlp_linux is the standalone binary  no Python dependency
 const downloadUrl =
   "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux";
 
-console.log("Downloading yt-dlp standalone Linux binary...");
 const response = await fetch(downloadUrl);
 if (!response.ok) {
-  console.error(`Failed to download yt-dlp: HTTP ${response.status}`);
   process.exit(1);
 }
 
 await pipeline(response.body, createWriteStream(binaryPath));
 chmodSync(binaryPath, "755");
-console.log("yt-dlp downloaded successfully");

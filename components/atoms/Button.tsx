@@ -1,7 +1,8 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import type { ButtonHTMLAttributes } from "react";
+
+import { cn } from "@/lib/utils";
 
 type Variant = "primary" | "secondary" | "ghost" | "danger";
 type Size = "sm" | "md";
@@ -27,13 +28,13 @@ const sizes: Record<Size, string> = {
   md: "px-4 py-2.5 text-sm",
 };
 
-export function Button({
+export const Button = ({
   variant = "primary",
   size = "md",
   className,
   children,
   ...props
-}: ButtonProps) {
+}: ButtonProps) => {
   return (
     <button
       className={cn(

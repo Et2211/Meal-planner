@@ -12,19 +12,22 @@ interface RoundCheckboxProps {
   className?: string;
 }
 
-const sizes: Record<Size, { container: string; viewBox: string; w: number; h: number }> = {
-  sm: { container: "w-5 h-5", viewBox: "0 0 10 8", w: 9, h: 7 },
-  md: { container: "w-6 h-6", viewBox: "0 0 10 8", w: 10, h: 8 },
+const sizes: Record<
+  Size,
+  { container: string; viewBox: string; width: number; height: number }
+> = {
+  sm: { container: "w-5 h-5", viewBox: "0 0 10 8", width: 9, height: 7 },
+  md: { container: "w-6 h-6", viewBox: "0 0 10 8", width: 10, height: 8 },
 };
 
-export function RoundCheckbox({
+export const RoundCheckbox = ({
   checked,
   onChange,
   title,
   size = "md",
   className,
-}: RoundCheckboxProps) {
-  const s = sizes[size];
+}: RoundCheckboxProps) => {
+  const sizeConfig = sizes[size];
   return (
     <button
       type="button"
@@ -32,15 +35,20 @@ export function RoundCheckbox({
       title={title}
       className={cn(
         "rounded-full border-2 flex items-center justify-center transition flex-shrink-0",
-        s.container,
+        sizeConfig.container,
         checked
           ? "bg-brand-500 border-brand-500"
           : "bg-white/80 border-stone-300 hover:border-brand-400",
-        className
+        className,
       )}
     >
       {checked && (
-        <svg width={s.w} height={s.h} viewBox={s.viewBox} fill="none">
+        <svg
+          width={sizeConfig.width}
+          height={sizeConfig.height}
+          viewBox={sizeConfig.viewBox}
+          fill="none"
+        >
           <path
             d="M1 4l3 3 5-6"
             stroke="white"
@@ -52,4 +60,4 @@ export function RoundCheckbox({
       )}
     </button>
   );
-}
+};

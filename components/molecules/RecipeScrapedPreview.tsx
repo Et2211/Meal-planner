@@ -1,9 +1,10 @@
 "use client";
 
+import { Check, Loader2, X } from "lucide-react";
 import Image from "next/image";
-import { Check, X, Loader2 } from "lucide-react";
-import { Button } from "@/components/atoms/Button";
+
 import { Badge } from "@/components/atoms/Badge";
+import { Button } from "@/components/atoms/Button";
 import type { ScrapedRecipe } from "@/lib/types";
 
 interface RecipeScrapedPreviewProps {
@@ -13,12 +14,12 @@ interface RecipeScrapedPreviewProps {
   onCancel: () => void;
 }
 
-export function RecipeScrapedPreview({
+export const RecipeScrapedPreview = ({
   recipe,
   isSaving,
   onSave,
   onCancel,
-}: RecipeScrapedPreviewProps) {
+}: RecipeScrapedPreviewProps) => {
   return (
     <div className="bg-white border border-stone-200 rounded-2xl overflow-hidden">
       <div className="flex gap-4 p-4">
@@ -37,11 +38,12 @@ export function RecipeScrapedPreview({
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-stone-900">{recipe.title}</h3>
           <p className="text-sm text-stone-500 mt-0.5">
-            {recipe.ingredients.length} ingredients · {recipe.instructions.length} steps
+            {recipe.ingredients.length} ingredients ·{" "}
+            {recipe.instructions.length} steps
           </p>
           <div className="flex flex-wrap gap-1 mt-2">
-            {recipe.ingredients.slice(0, 5).map((ing, i) => (
-              <Badge key={i}>{ing.name}</Badge>
+            {recipe.ingredients.slice(0, 5).map((ing, idx) => (
+              <Badge key={idx}>{ing.name}</Badge>
             ))}
             {recipe.ingredients.length > 5 && (
               <span className="text-xs text-stone-400">
@@ -54,7 +56,11 @@ export function RecipeScrapedPreview({
 
       <div className="flex items-center gap-2 px-4 pb-4">
         <Button onClick={onSave} disabled={isSaving}>
-          {isSaving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+          {isSaving ? (
+            <Loader2 size={14} className="animate-spin" />
+          ) : (
+            <Check size={14} />
+          )}
           {isSaving ? "Saving…" : "Save recipe"}
         </Button>
         <Button variant="ghost" onClick={onCancel}>
@@ -64,4 +70,4 @@ export function RecipeScrapedPreview({
       </div>
     </div>
   );
-}
+};
