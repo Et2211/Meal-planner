@@ -2,11 +2,14 @@
 // The standalone binary has Python bundled — no system Python required.
 // Skipped automatically on non-Linux platforms (macOS uses the Homebrew install).
 import { chmodSync, createWriteStream, existsSync, mkdirSync } from "fs";
-import { pipeline } from "stream/promises";
 import path from "path";
+import { pipeline } from "stream/promises";
 import { fileURLToPath } from "url";
 
-const projectRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
+const projectRoot = path.join(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "..",
+);
 const binDir = path.join(projectRoot, "bin");
 const binaryPath = path.join(binDir, "yt-dlp");
 
@@ -16,6 +19,7 @@ if (process.platform !== "linux") {
 }
 
 if (existsSync(binaryPath)) {
+  // eslint-disable-next-line no-console
   console.log("yt-dlp binary already present, skipping download");
   process.exit(0);
 }
