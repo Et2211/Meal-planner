@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import * as cheerio from "cheerio";
 import { parseIngredient } from "@/lib/ingredient-parser";
-import { scrapeInstagramReel, isInstagramUrl } from "@/lib/instagram";
+import { scrapeInstagramReel, isInstagramUrl, isFacebookUrl } from "@/lib/instagram";
 import type { ScrapedRecipe } from "@/lib/types";
 
 export async function POST(request: Request) {
@@ -24,8 +24,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Only HTTP/HTTPS URLs are supported" }, { status: 400 });
     }
 
-    // Instagram Reels — use yt-dlp + Gemini instead of HTML scraping
-    if (isInstagramUrl(url)) {
+    // Instagram/Facebook Reels — use yt-dlp + Gemini instead of HTML scraping
+    if (isInstagramUrl(url) || isFacebookUrl(url)) {
       const recipe = await scrapeInstagramReel(url);
       return NextResponse.json({ recipe });
     }

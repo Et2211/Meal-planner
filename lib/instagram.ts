@@ -104,3 +104,17 @@ export function isInstagramUrl(url: string): boolean {
     return false;
   }
 }
+
+export function isFacebookUrl(url: string): boolean {
+  try {
+    const { hostname } = new URL(url);
+    return (
+      hostname === "facebook.com" ||
+      hostname === "www.facebook.com" ||
+      hostname === "m.facebook.com" ||
+      hostname === "fb.watch"
+    );
+  } catch {
+    return false;
+  }
+}
