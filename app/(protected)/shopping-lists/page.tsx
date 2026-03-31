@@ -1,14 +1,11 @@
 import { ArrowLeft, ChevronRight, ClipboardList, ShoppingCart } from "lucide-react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
 import type { SavedShoppingList } from "@/lib/types";
 
 export default async function ShoppingListsPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
 
   const { data } = await supabase
     .from("shopping_lists")
