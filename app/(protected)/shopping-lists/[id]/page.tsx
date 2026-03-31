@@ -1,4 +1,4 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
 import { SavedShoppingListView } from "@/components/organisms/SavedShoppingListView";
 import { createClient } from "@/lib/supabase/server";
@@ -11,9 +11,6 @@ interface Props {
 export default async function SavedShoppingListPage({ params }: Props) {
   const { id } = await params;
   const supabase = await createClient();
-
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
 
   const { data } = await supabase
     .from("shopping_lists")

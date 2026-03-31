@@ -1,7 +1,7 @@
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
 import { formatShoppingItem } from "@/lib/ingredient-parser";
 import { createClient } from "@/lib/supabase/server";
@@ -14,16 +14,11 @@ export default async function RecipeDetailPage({
 }) {
   const { id } = await params;
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
 
   const { data: recipe } = await supabase
     .from("recipes")
     .select("*")
     .eq("id", id)
-    .eq("user_id", user.id)
     .single();
 
   if (!recipe) notFound();
