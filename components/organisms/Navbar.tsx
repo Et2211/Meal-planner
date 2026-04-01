@@ -1,6 +1,6 @@
 "use client";
 
-import { ChefHat, ClipboardList, LogOut, ShoppingCart } from "lucide-react";
+import { ChefHat, ClipboardList, LogOut, ShoppingCart, Star } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -30,6 +30,13 @@ export const Navbar = ({ selectedCount, onShoppingListClick }: NavbarProps) => {
         </Link>
 
         <div className="flex items-center gap-2">
+          <Link
+            href="/top-rated"
+            className="p-2 text-stone-500 hover:text-stone-700 hover:bg-stone-100 rounded-lg transition"
+            title="Top rated recipes"
+          >
+            <Star size={18} />
+          </Link>
           <Link
             href="/shopping-lists"
             className="p-2 text-stone-500 hover:text-stone-700 hover:bg-stone-100 rounded-lg transition"

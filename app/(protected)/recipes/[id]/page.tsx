@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { RecipeImage } from "@/components/atoms/RecipeImage";
+import { RecipeRatingWidget } from "@/components/molecules/RecipeRatingWidget";
 import { formatShoppingItem } from "@/lib/ingredient-parser";
 import { createClient } from "@/lib/supabase/server";
 import type { Recipe } from "@/lib/types";
@@ -25,6 +26,16 @@ export default async function RecipeDetailPage({
 
   const recipeObj = recipe as Recipe;
 
+  const [{ data: { user } }, { data: ratings }] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase.from("recipe_ratings").select("user_id, rating").eq("source_url", recipeObj.source_url),
+  ]);
+
+  const avgRating = ratings?.length
+    ? ratings.reduce((sum, row) => sum + row.rating, 0) / ratings.length
+    : null;
+  const userRating = ratings?.find((row) => row.user_id === user?.id)?.rating ?? null;
+
   return (
     <div className="min-h-screen bg-stone-50">
       <header className="sticky top-0 z-10 bg-white border-b border-stone-200">
@@ -46,7 +57,7 @@ export default async function RecipeDetailPage({
           <RecipeImage src={recipeObj.image_url} alt={recipeObj.title} variant="detail" />
         )}
 
-        <div className="flex items-start justify-between gap-4 mb-8">
+        <div className="flex items-start justify-between gap-4 mb-3">
           <h1 className="text-2xl font-bold text-stone-900">
             {recipeObj.title}
           </h1>
@@ -59,6 +70,15 @@ export default async function RecipeDetailPage({
             <ExternalLink size={14} />
             Source
           </a>
+        </div>
+
+        <div className="mb-8">
+          <RecipeRatingWidget
+            sourceUrl={recipeObj.source_url}
+            initialAvg={avgRating}
+            initialCount={ratings?.length ?? 0}
+            initialUserRating={userRating}
+          />
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">

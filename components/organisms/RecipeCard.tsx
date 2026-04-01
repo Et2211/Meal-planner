@@ -5,7 +5,8 @@ import Link from "next/link";
 
 import { RecipeImage } from "@/components/atoms/RecipeImage";
 import { RoundCheckbox } from "@/components/atoms/RoundCheckbox";
-import type { Recipe } from "@/lib/types";
+import { StarRating } from "@/components/atoms/StarRating";
+import type { RatingInfo, Recipe } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 interface RecipeCardProps {
@@ -13,9 +14,10 @@ interface RecipeCardProps {
   selected: boolean;
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
+  avgRating: RatingInfo | null;
 }
 
-export const RecipeCard = ({ recipe, selected, onToggle, onDelete }: RecipeCardProps) => {
+export const RecipeCard = ({ recipe, selected, onToggle, onDelete, avgRating }: RecipeCardProps) => {
   return (
     <div
       className={cn(
@@ -66,6 +68,12 @@ export const RecipeCard = ({ recipe, selected, onToggle, onDelete }: RecipeCardP
             <ExternalLink size={13} />
           </a>
         </div>
+        {avgRating && (
+          <div className="flex items-center gap-1 mt-1.5">
+            <StarRating value={Math.round(avgRating.avg)} />
+            <span className="text-xs text-stone-400">{avgRating.avg.toFixed(1)}</span>
+          </div>
+        )}
       </div>
     </div>
   );
