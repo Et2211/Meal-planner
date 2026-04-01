@@ -2,10 +2,13 @@
 
 import { Check, Loader2, X } from "lucide-react";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
 import { Badge } from "@/components/atoms/Badge";
 import { Button } from "@/components/atoms/Button";
-import type { ScrapedRecipe } from "@/lib/types";
+import { StarRating } from "@/components/atoms/StarRating";
+import { createClient } from "@/lib/supabase/client";
+import type { RatingInfo, ScrapedRecipe } from "@/lib/types";
 
 interface RecipeScrapedPreviewProps {
   recipe: ScrapedRecipe;
@@ -20,6 +23,23 @@ export const RecipeScrapedPreview = ({
   onSave,
   onCancel,
 }: RecipeScrapedPreviewProps) => {
+  const [ratingInfo, setRatingInfo] = useState<RatingInfo | null>(null);
+
+  useEffect(() => {
+    async function fetchRating() {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from("recipe_ratings")
+        .select("rating")
+        .eq("source_url", recipe.source_url);
+      if (data?.length) {
+        const avg = data.reduce((sum, row) => sum + row.rating, 0) / data.length;
+        setRatingInfo({ avg, count: data.length });
+      }
+    }
+    fetchRating();
+  }, [recipe.source_url]);
+
   return (
     <div className="bg-white border border-stone-200 rounded-2xl overflow-hidden">
       <div className="flex gap-4 p-4">
@@ -41,6 +61,14 @@ export const RecipeScrapedPreview = ({
             {recipe.ingredients.length} ingredients ·{" "}
             {recipe.instructions.length} steps
           </p>
+          {ratingInfo && (
+            <div className="flex items-center gap-1.5 mt-1.5">
+              <StarRating value={Math.round(ratingInfo.avg)} />
+              <span className="text-xs text-stone-400">
+                {ratingInfo.avg.toFixed(1)} ({ratingInfo.count})
+              </span>
+            </div>
+          )}
           <div className="flex flex-wrap gap-1 mt-2">
             {recipe.ingredients.slice(0, 5).map((ing, idx) => (
               <Badge key={idx}>{ing.name}</Badge>

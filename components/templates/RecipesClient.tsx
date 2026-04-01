@@ -8,13 +8,14 @@ import { Navbar } from "@/components/organisms/Navbar";
 import { RecipeCard } from "@/components/organisms/RecipeCard";
 import { RecipeRow } from "@/components/organisms/RecipeRow";
 import { createClient } from "@/lib/supabase/client";
-import type { Recipe } from "@/lib/types";
+import type { RatingInfo, Recipe } from "@/lib/types";
 
 interface RecipesClientProps {
   initialRecipes: Recipe[];
+  avgRatings: Record<string, RatingInfo>;
 }
 
-export const RecipesClient = ({ initialRecipes }: RecipesClientProps) => {
+export const RecipesClient = ({ initialRecipes, avgRatings }: RecipesClientProps) => {
   const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
   const [search, setSearch] = useState("");
   // Filter recipes by search query (title or ingredient)
@@ -131,6 +132,7 @@ export const RecipesClient = ({ initialRecipes }: RecipesClientProps) => {
                 selected={selected.has(recipe.id)}
                 onToggle={toggleSelect}
                 onDelete={handleDelete}
+                avgRating={avgRatings[recipe.source_url] ?? null}
               />
             ))}
           </div>

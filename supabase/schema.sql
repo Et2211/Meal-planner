@@ -61,6 +61,40 @@ create policy "Authenticated users can update scrape cache"
   to authenticated
   using (true);
 
+-- Recipe ratings: shared across users, keyed by source_url
+create table if not exists public.recipe_ratings (
+  id         uuid primary key default gen_random_uuid(),
+  user_id    uuid not null references auth.users(id) on delete cascade,
+  source_url text not null,
+  rating     smallint not null check (rating between 1 and 5),
+  created_at timestamptz not null default now(),
+  unique(user_id, source_url)
+);
+
+create index if not exists recipe_ratings_source_url_idx on public.recipe_ratings(source_url);
+
+alter table public.recipe_ratings enable row level security;
+
+create policy "Authenticated users can read ratings"
+  on public.recipe_ratings for select
+  to authenticated
+  using (true);
+
+create policy "Users can insert own ratings"
+  on public.recipe_ratings for insert
+  to authenticated
+  with check (auth.uid() = user_id);
+
+create policy "Users can update own ratings"
+  on public.recipe_ratings for update
+  to authenticated
+  using (auth.uid() = user_id);
+
+create policy "Users can delete own ratings"
+  on public.recipe_ratings for delete
+  to authenticated
+  using (auth.uid() = user_id);
+
 -- Shopping lists: named, saveable lists with checked state and custom items
 create table if not exists public.shopping_lists (
   id          uuid primary key default gen_random_uuid(),

@@ -37,6 +37,11 @@ export interface SavedListItem {
   custom: boolean;
 }
 
+export interface RatingInfo {
+  avg: number;
+  count: number;
+}
+
 export interface SavedShoppingList {
   id: string;
   user_id: string;
