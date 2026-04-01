@@ -7,6 +7,8 @@ import { createClient } from "@/lib/supabase/client";
 
 interface RecipeRatingWidgetProps {
   sourceUrl: string;
+  title: string;
+  imageUrl: string | null;
   initialAvg: number | null;
   initialCount: number;
   initialUserRating: number | null;
@@ -14,6 +16,8 @@ interface RecipeRatingWidgetProps {
 
 export const RecipeRatingWidget = ({
   sourceUrl,
+  title,
+  imageUrl,
   initialAvg,
   initialCount,
   initialUserRating,
@@ -28,7 +32,7 @@ export const RecipeRatingWidget = ({
     if (!user) return;
 
     await supabase.from("recipe_ratings").upsert(
-      { user_id: user.id, source_url: sourceUrl, rating },
+      { user_id: user.id, source_url: sourceUrl, rating, title, image_url: imageUrl },
       { onConflict: "user_id,source_url" },
     );
 

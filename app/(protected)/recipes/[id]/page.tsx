@@ -75,6 +75,8 @@ export default async function RecipeDetailPage({
         <div className="mb-8">
           <RecipeRatingWidget
             sourceUrl={recipeObj.source_url}
+            title={recipeObj.title}
+            imageUrl={recipeObj.image_url}
             initialAvg={avgRating}
             initialCount={ratings?.length ?? 0}
             initialUserRating={userRating}
