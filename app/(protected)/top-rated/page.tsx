@@ -1,15 +1,19 @@
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
+import { QuickAddButton } from "@/components/atoms/QuickAddButton";
 import { StarRating } from "@/components/atoms/StarRating";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function TopRatedPage() {
   const supabase = await createClient();
 
-  const { data: ratings } = await supabase
-    .from("recipe_ratings")
-    .select("source_url, rating, title, image_url");
+  const [{ data: ratings }, { data: saved }] = await Promise.all([
+    supabase.from("recipe_ratings").select("source_url, rating, title, image_url"),
+    supabase.from("recipes").select("source_url"),
+  ]);
+
+  const savedUrls = new Set((saved ?? []).map((row) => row.source_url));
 
   // Group by source_url — compute avg, take title/image from any row
   const map: Record<string, { avg: number; count: number; title: string | null; image_url: string | null }> = {};
@@ -20,7 +24,6 @@ export default async function TopRatedPage() {
     const entry = map[row.source_url];
     entry.avg = (entry.avg * entry.count + row.rating) / (entry.count + 1);
     entry.count += 1;
-    // Use a title/image if we don't have one yet
     if (!entry.title && row.title) entry.title = row.title;
     if (!entry.image_url && row.image_url) entry.image_url = row.image_url;
   }
@@ -59,13 +62,7 @@ export default async function TopRatedPage() {
         ) : (
           <div className="bg-white border border-stone-200 rounded-2xl overflow-hidden divide-y divide-stone-100">
             {ranked.map(([sourceUrl, entry], index) => (
-              <a
-                key={sourceUrl}
-                href={sourceUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-4 px-4 py-4 hover:bg-stone-50 transition group"
-              >
+              <div key={sourceUrl} className="flex items-center gap-4 px-4 py-4">
                 <span className="w-6 text-center text-sm font-semibold text-stone-400 flex-shrink-0">
                   {index + 1}
                 </span>
@@ -75,7 +72,12 @@ export default async function TopRatedPage() {
                     <img src={entry.image_url} alt={entry.title ?? ""} className="w-full h-full object-cover" />
                   </div>
                 )}
-                <div className="flex-1 min-w-0">
+                <a
+                  href={sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 min-w-0 group"
+                >
                   <p className="text-sm font-medium text-stone-900 truncate group-hover:text-brand-600 transition">
                     {entry.title ?? new URL(sourceUrl).hostname}
                   </p>
@@ -85,8 +87,11 @@ export default async function TopRatedPage() {
                       {entry.avg.toFixed(1)} · {entry.count} {entry.count === 1 ? "rating" : "ratings"}
                     </span>
                   </div>
-                </div>
-              </a>
+                </a>
+                {!savedUrls.has(sourceUrl) && (
+                  <QuickAddButton sourceUrl={sourceUrl} />
+                )}
+              </div>
             ))}
           </div>
         )}
