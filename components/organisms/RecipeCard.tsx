@@ -1,8 +1,9 @@
 "use client";
 
-import { ExternalLink, Trash2 } from "lucide-react";
+import { ChefHat, ExternalLink, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 
 import { RoundCheckbox } from "@/components/atoms/RoundCheckbox";
 import type { Recipe } from "@/lib/types";
@@ -16,6 +17,8 @@ interface RecipeCardProps {
 }
 
 export const RecipeCard = ({ recipe, selected, onToggle, onDelete }: RecipeCardProps) => {
+  const [imgError, setImgError] = useState(false);
+
   return (
     <div
       className={cn(
@@ -41,7 +44,7 @@ export const RecipeCard = ({ recipe, selected, onToggle, onDelete }: RecipeCardP
 
       <Link href={`/recipes/${recipe.id}`}>
         <div className="aspect-[4/3] bg-stone-100 overflow-hidden">
-          {recipe.image_url ? (
+          {recipe.image_url && !imgError ? (
             <Image
               src={recipe.image_url}
               alt={recipe.title}
@@ -49,10 +52,11 @@ export const RecipeCard = ({ recipe, selected, onToggle, onDelete }: RecipeCardP
               height={300}
               className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
               unoptimized
+              onError={() => setImgError(true)}
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-stone-300 text-4xl">
-              🍽️
+            <div className="w-full h-full flex items-center justify-center">
+              <ChefHat size={48} className="text-stone-300" />
             </div>
           )}
         </div>
