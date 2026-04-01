@@ -3,6 +3,7 @@
 import { Check, Loader2, Plus } from "lucide-react";
 import { useState } from "react";
 
+import { revalidateUserRecipes } from "@/lib/actions/revalidate";
 import { createClient } from "@/lib/supabase/client";
 
 interface QuickAddButtonProps {
@@ -39,6 +40,7 @@ export const QuickAddButton = ({ sourceUrl }: QuickAddButtonProps) => {
         instructions: data.recipe.instructions,
       });
 
+      if (!error) await revalidateUserRecipes(user.id);
       setState(error ? "error" : "saved");
     } catch {
       setState("error");

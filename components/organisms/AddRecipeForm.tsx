@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Button } from "@/components/atoms/Button";
 import { Input } from "@/components/atoms/Input";
 import { RecipeScrapedPreview } from "@/components/molecules/RecipeScrapedPreview";
+import { revalidateUserRecipes } from "@/lib/actions/revalidate";
 import { createClient } from "@/lib/supabase/client";
 import type { ScrapedRecipe } from "@/lib/types";
 
@@ -71,6 +72,7 @@ export const AddRecipeForm = ({ onAdded }: AddRecipeFormProps) => {
       return;
     }
 
+    await revalidateUserRecipes(user.id);
     setUrl("");
     setScraped(null);
     setStep("idle");

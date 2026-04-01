@@ -1,9 +1,11 @@
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 
 import { RecipeImage } from "@/components/atoms/RecipeImage";
 import { RecipeRatingWidget } from "@/components/molecules/RecipeRatingWidget";
+import { fetchRatingsForUrl, fetchUserRecipes } from "@/lib/data/recipes";
 import { formatShoppingItem } from "@/lib/ingredient-parser";
 import { createClient } from "@/lib/supabase/server";
 import type { Recipe } from "@/lib/types";
@@ -13,28 +15,21 @@ export default async function RecipeDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await connection();
   const { id } = await params;
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  const { data: recipe } = await supabase
-    .from("recipes")
-    .select("*")
-    .eq("id", id)
-    .single();
+  const recipes = await fetchUserRecipes(user!.id);
+  const recipeObj = recipes.find((recipe) => recipe.id === id) as Recipe | undefined;
+  if (!recipeObj) notFound();
 
-  if (!recipe) notFound();
+  const ratingRows = await fetchRatingsForUrl(recipeObj.source_url);
 
-  const recipeObj = recipe as Recipe;
-
-  const [{ data: { user } }, { data: ratings }] = await Promise.all([
-    supabase.auth.getUser(),
-    supabase.from("recipe_ratings").select("user_id, rating").eq("source_url", recipeObj.source_url),
-  ]);
-
-  const avgRating = ratings?.length
-    ? ratings.reduce((sum, row) => sum + row.rating, 0) / ratings.length
+  const avgRating = ratingRows.length
+    ? ratingRows.reduce((sum, row) => sum + row.rating, 0) / ratingRows.length
     : null;
-  const userRating = ratings?.find((row) => row.user_id === user?.id)?.rating ?? null;
+  const userRating = ratingRows.find((row) => row.user_id === user!.id)?.rating ?? null;
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -78,13 +73,12 @@ export default async function RecipeDetailPage({
             title={recipeObj.title}
             imageUrl={recipeObj.image_url}
             initialAvg={avgRating}
-            initialCount={ratings?.length ?? 0}
+            initialCount={ratingRows.length}
             initialUserRating={userRating}
           />
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">
-          {/* Ingredients */}
           <section>
             <h2 className="text-lg font-semibold text-stone-900 mb-3">
               Ingredients
@@ -94,10 +88,7 @@ export default async function RecipeDetailPage({
             </h2>
             <ul className="space-y-2">
               {recipeObj.ingredients.map((ing, idx) => (
-                <li
-                  key={idx}
-                  className="flex items-start gap-2 text-sm text-stone-700"
-                >
+                <li key={idx} className="flex items-start gap-2 text-sm text-stone-700">
                   <span className="w-1.5 h-1.5 rounded-full bg-brand-400 flex-shrink-0 mt-1.5" />
                   {formatShoppingItem({
                     name: ing.name,
@@ -110,7 +101,6 @@ export default async function RecipeDetailPage({
             </ul>
           </section>
 
-          {/* Instructions */}
           <section>
             <h2 className="text-lg font-semibold text-stone-900 mb-3">
               Instructions

@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { StarRating } from "@/components/atoms/StarRating";
+import { revalidateRatings } from "@/lib/actions/revalidate";
 import { createClient } from "@/lib/supabase/client";
 
 interface RecipeRatingWidgetProps {
@@ -43,6 +44,7 @@ export const RecipeRatingWidget = ({
     setAvg(newSum / newCount);
     setCount(newCount);
     setUserRating(rating);
+    await revalidateRatings();
   }
 
   return (

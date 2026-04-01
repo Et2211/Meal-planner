@@ -10,6 +10,7 @@ import { Button } from "@/components/atoms/Button";
 import { Input } from "@/components/atoms/Input";
 import { RoundCheckbox } from "@/components/atoms/RoundCheckbox";
 import { Spinner } from "@/components/atoms/Spinner";
+import { revalidateShoppingList, revalidateUserShoppingLists } from "@/lib/actions/revalidate";
 import { createClient } from "@/lib/supabase/client";
 import type { SavedListItem, SavedShoppingList } from "@/lib/types";
 
@@ -45,10 +46,9 @@ export const SavedShoppingListView = ({ list }: Props) => {
   async function handleSave() {
     setSaving(true);
     const supabase = createClient();
-    await supabase
-      .from("shopping_lists")
-      .update({ name: listName, items })
-      .eq("id", list.id);
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase.from("shopping_lists").update({ name: listName, items }).eq("id", list.id);
+    if (user) await revalidateShoppingList(list.id, user.id);
     setSaving(false);
     setSaveFeedback(true);
     setTimeout(() => setSaveFeedback(false), 2000);
@@ -58,7 +58,9 @@ export const SavedShoppingListView = ({ list }: Props) => {
     if (!confirm(`Delete "${listName}"?`)) return;
     setDeleting(true);
     const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
     await supabase.from("shopping_lists").delete().eq("id", list.id);
+    if (user) await revalidateUserShoppingLists(user.id);
     router.push("/shopping-lists");
   }
 
