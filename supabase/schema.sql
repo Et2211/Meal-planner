@@ -37,14 +37,29 @@ create policy "Users can delete own recipes"
   using (auth.uid() = user_id);
 
 -- Scrape cache: shared cache for social media URL scrapes
--- No RLS — not user-specific, no sensitive data
+-- RLS enabled — authenticated users can read/write; no delete policy (rows are permanent)
 create table if not exists public.scrape_cache (
   url        text primary key,
   recipe     jsonb not null,
   created_at timestamptz not null default now()
 );
 
-alter table public.scrape_cache disable row level security;
+alter table public.scrape_cache enable row level security;
+
+create policy "Authenticated users can read scrape cache"
+  on public.scrape_cache for select
+  to authenticated
+  using (true);
+
+create policy "Authenticated users can write scrape cache"
+  on public.scrape_cache for insert
+  to authenticated
+  with check (true);
+
+create policy "Authenticated users can update scrape cache"
+  on public.scrape_cache for update
+  to authenticated
+  using (true);
 
 -- Shopping lists: named, saveable lists with checked state and custom items
 create table if not exists public.shopping_lists (
