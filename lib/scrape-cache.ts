@@ -1,16 +1,9 @@
-import { createClient } from "@supabase/supabase-js";
-
+import { createClient } from "./supabase/server";
 import type { ScrapedRecipe } from "./types";
 
-function getClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!
-  );
-}
-
 export async function getCachedScrape(url: string): Promise<ScrapedRecipe | null> {
-  const { data } = await getClient()
+  const supabase = await createClient();
+  const { data } = await supabase
     .from("scrape_cache")
     .select("recipe")
     .eq("url", url)
@@ -19,7 +12,8 @@ export async function getCachedScrape(url: string): Promise<ScrapedRecipe | null
 }
 
 export async function setCachedScrape(url: string, recipe: ScrapedRecipe): Promise<void> {
-  const { error } = await getClient()
+  const supabase = await createClient();
+  const { error } = await supabase
     .from("scrape_cache")
     .upsert({ url, recipe });
   if (error) {
