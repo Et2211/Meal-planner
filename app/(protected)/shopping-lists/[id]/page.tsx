@@ -1,24 +1,22 @@
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 
 import { SavedShoppingListView } from "@/components/organisms/SavedShoppingListView";
+import { fetchShoppingList } from "@/lib/data/shopping-lists";
 import { createClient } from "@/lib/supabase/server";
-import type { SavedShoppingList } from "@/lib/types";
 
 interface Props {
   params: Promise<{ id: string }>;
 }
 
 export default async function SavedShoppingListPage({ params }: Props) {
+  await connection();
   const { id } = await params;
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  const { data } = await supabase
-    .from("shopping_lists")
-    .select("*")
-    .eq("id", id)
-    .single();
+  const list = await fetchShoppingList(id, user!.id);
+  if (!list) notFound();
 
-  if (!data) notFound();
-
-  return <SavedShoppingListView list={data as SavedShoppingList} />;
+  return <SavedShoppingListView list={list} />;
 }

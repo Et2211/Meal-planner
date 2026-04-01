@@ -8,6 +8,7 @@ import { ShoppingListEntries } from "@/components/atoms/ShoppingListEntries";
 import { ShoppingListHeader } from "@/components/atoms/ShoppingListHeader";
 import { ShoppingListRecipeBadges } from "@/components/atoms/ShoppingListRecipeBadges";
 import { Spinner } from "@/components/atoms/Spinner";
+import { revalidateUserShoppingLists } from "@/lib/actions/revalidate";
 import { buildShoppingList, formatShoppingItem } from "@/lib/ingredient-parser";
 import { createClient } from "@/lib/supabase/client";
 import type { Recipe } from "@/lib/types";
@@ -147,6 +148,7 @@ export const ShoppingList = () => {
       if (data) setSavedId(data.id as string);
     }
 
+    await revalidateUserShoppingLists(user.id);
     setSaving(false);
     setSaveFeedback(true);
     setTimeout(() => setSaveFeedback(false), 2000);

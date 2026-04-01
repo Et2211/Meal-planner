@@ -7,6 +7,7 @@ import { AddRecipeForm } from "@/components/organisms/AddRecipeForm";
 import { Navbar } from "@/components/organisms/Navbar";
 import { RecipeCard } from "@/components/organisms/RecipeCard";
 import { RecipeRow } from "@/components/organisms/RecipeRow";
+import { revalidateUserRecipes } from "@/lib/actions/revalidate";
 import { createClient } from "@/lib/supabase/client";
 import type { RatingInfo, Recipe } from "@/lib/types";
 
@@ -45,7 +46,9 @@ export const RecipesClient = ({ initialRecipes, avgRatings }: RecipesClientProps
 
   async function handleDelete(id: string) {
     const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
     await supabase.from("recipes").delete().eq("id", id);
+    if (user) await revalidateUserRecipes(user.id);
     setRecipes((prev) => prev.filter((recipe) => recipe.id !== id));
     setSelected((prev) => {
       const next = new Set(prev);

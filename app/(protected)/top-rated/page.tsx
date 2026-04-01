@@ -1,11 +1,13 @@
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { connection } from "next/server";
 
 import { QuickAddButton } from "@/components/atoms/QuickAddButton";
 import { StarRating } from "@/components/atoms/StarRating";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function TopRatedPage() {
+  await connection();
   const supabase = await createClient();
 
   const [{ data: ratings }, { data: saved }] = await Promise.all([

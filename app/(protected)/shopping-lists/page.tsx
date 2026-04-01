@@ -1,18 +1,16 @@
 import { ArrowLeft, ChevronRight, ClipboardList, ShoppingCart } from "lucide-react";
 import Link from "next/link";
+import { connection } from "next/server";
 
+import { fetchUserShoppingLists } from "@/lib/data/shopping-lists";
 import { createClient } from "@/lib/supabase/server";
-import type { SavedShoppingList } from "@/lib/types";
 
 export default async function ShoppingListsPage() {
+  await connection();
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  const { data } = await supabase
-    .from("shopping_lists")
-    .select("id, name, items, created_at")
-    .order("created_at", { ascending: false });
-
-  const lists = (data ?? []) as Pick<SavedShoppingList, "id" | "name" | "items" | "created_at">[];
+  const lists = await fetchUserShoppingLists(user!.id);
 
   return (
     <div className="min-h-screen bg-stone-50">
