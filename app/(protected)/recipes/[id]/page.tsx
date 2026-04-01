@@ -1,8 +1,8 @@
 import { ArrowLeft, ExternalLink } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { RecipeImage } from "@/components/atoms/RecipeImage";
 import { formatShoppingItem } from "@/lib/ingredient-parser";
 import { createClient } from "@/lib/supabase/server";
 import type { Recipe } from "@/lib/types";
@@ -43,16 +43,7 @@ export default async function RecipeDetailPage({
 
       <main className="max-w-3xl mx-auto px-4 py-8">
         {recipeObj.image_url && (
-          <div className="rounded-2xl overflow-hidden mb-8 aspect-video bg-stone-200">
-            <Image
-              src={recipeObj.image_url}
-              alt={recipeObj.title}
-              width={800}
-              height={450}
-              className="w-full h-full object-cover"
-              unoptimized
-            />
-          </div>
+          <RecipeImage src={recipeObj.image_url} alt={recipeObj.title} variant="detail" />
         )}
 
         <div className="flex items-start justify-between gap-4 mb-8">
