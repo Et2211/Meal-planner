@@ -1,8 +1,9 @@
-import { ArrowLeft, ExternalLink, Pencil } from "lucide-react";
+import { ExternalLink, Pencil } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 
+import { PageHeader } from "@/components/atoms/PageHeader";
 import { RecipeImage } from "@/components/atoms/RecipeImage";
 import { RecipeRatingWidget } from "@/components/molecules/RecipeRatingWidget";
 import { fetchRatingsForUrl, fetchUserRecipes } from "@/lib/data/recipes";
@@ -35,17 +36,11 @@ export default async function RecipeDetailPage({
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <header className="sticky top-0 z-10 bg-white border-b border-stone-200">
-        <div className="max-w-3xl mx-auto px-4 h-14 flex items-center gap-3">
-          <Link
-            href="/recipes"
-            className="p-2 -ml-2 text-stone-500 hover:text-stone-700 hover:bg-stone-100 rounded-lg transition"
-          >
-            <ArrowLeft size={18} />
-          </Link>
-          <span className="font-semibold text-stone-900 truncate flex-1">
-            {recipeObj.title}
-          </span>
+      <PageHeader
+        backHref="/recipes"
+        title={recipeObj.title}
+        maxWidth="3xl"
+        actions={
           <Link
             href={`/recipes/${id}/edit`}
             className="flex items-center gap-1.5 text-sm text-stone-500 hover:text-stone-700 hover:bg-stone-100 px-3 py-1.5 rounded-lg transition"
@@ -53,8 +48,8 @@ export default async function RecipeDetailPage({
             <Pencil size={14} />
             Edit
           </Link>
-        </div>
-      </header>
+        }
+      />
 
       <main className="max-w-3xl mx-auto px-4 py-8">
         {recipeObj.image_url && (

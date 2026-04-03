@@ -1,9 +1,8 @@
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
 import { connection } from "next/server";
 
-import { QuickAddButton } from "@/components/atoms/QuickAddButton";
-import { StarRating } from "@/components/atoms/StarRating";
+import { PageEmptyState } from "@/components/atoms/PageEmptyState";
+import { PageHeader } from "@/components/atoms/PageHeader";
+import { TopRatedRecipeRow } from "@/components/molecules/TopRatedRecipeRow";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function TopRatedPage() {
@@ -35,65 +34,30 @@ export default async function TopRatedPage() {
 
   return (
     <div className="min-h-screen bg-stone-50">
-      <header className="sticky top-0 z-10 bg-white border-b border-stone-200">
-        <div className="max-w-2xl mx-auto px-4 h-14 flex items-center gap-3">
-          <Link
-            href="/recipes"
-            className="p-2 -ml-2 text-stone-500 hover:text-stone-700 hover:bg-stone-100 rounded-lg transition"
-          >
-            <ArrowLeft size={18} />
-          </Link>
-          <span className="font-semibold text-stone-900">Top Rated</span>
-        </div>
-      </header>
+      <PageHeader backHref="/recipes" title="Top Rated" />
 
       <main className="max-w-2xl mx-auto px-4 py-8">
         {ranked.length === 0 ? (
-          <div className="text-center py-20 text-stone-400">
-            <div className="text-5xl mb-4">⭐</div>
-            <p className="text-lg font-medium text-stone-500">No ratings yet</p>
-            <p className="text-sm mt-1 mb-6">Open a recipe and leave the first rating</p>
-            <Link
-              href="/recipes"
-              className="inline-flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition"
-            >
-              <ArrowLeft size={14} />
-              Back to recipes
-            </Link>
-          </div>
+          <PageEmptyState
+            emoji="⭐"
+            title="No ratings yet"
+            subtitle="Open a recipe and leave the first rating"
+            ctaHref="/recipes"
+            ctaLabel="Back to recipes"
+          />
         ) : (
           <div className="bg-white border border-stone-200 rounded-2xl overflow-hidden divide-y divide-stone-100">
             {ranked.map(([sourceUrl, entry], index) => (
-              <div key={sourceUrl} className="flex items-center gap-4 px-4 py-4">
-                <span className="w-6 text-center text-sm font-semibold text-stone-400 flex-shrink-0">
-                  {index + 1}
-                </span>
-                {entry.image_url && (
-                  <div className="w-10 h-10 rounded-lg overflow-hidden bg-stone-100 flex-shrink-0">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={entry.image_url} alt={entry.title ?? ""} className="w-full h-full object-cover" />
-                  </div>
-                )}
-                <a
-                  href={sourceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 min-w-0 group"
-                >
-                  <p className="text-sm font-medium text-stone-900 truncate group-hover:text-brand-600 transition">
-                    {entry.title ?? new URL(sourceUrl).hostname}
-                  </p>
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <StarRating value={Math.round(entry.avg)} />
-                    <span className="text-xs text-stone-400">
-                      {entry.avg.toFixed(1)} · {entry.count} {entry.count === 1 ? "rating" : "ratings"}
-                    </span>
-                  </div>
-                </a>
-                {!savedUrls.has(sourceUrl) && (
-                  <QuickAddButton sourceUrl={sourceUrl} />
-                )}
-              </div>
+              <TopRatedRecipeRow
+                key={sourceUrl}
+                rank={index + 1}
+                sourceUrl={sourceUrl}
+                title={entry.title}
+                imageUrl={entry.image_url}
+                avgRating={entry.avg}
+                ratingCount={entry.count}
+                isSaved={savedUrls.has(sourceUrl)}
+              />
             ))}
           </div>
         )}

@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 
+import { PageEmptyState } from "@/components/atoms/PageEmptyState";
 import { type ViewMode, ViewToggle } from "@/components/molecules/ViewToggle";
 import { AddRecipeForm } from "@/components/organisms/AddRecipeForm";
 import { Navbar } from "@/components/organisms/Navbar";
@@ -119,13 +120,11 @@ export const RecipesClient = ({ initialRecipes, avgRatings }: RecipesClientProps
         )}
 
         {filteredRecipes.length === 0 ? (
-          <div className="text-center py-20 text-stone-400">
-            <div className="text-5xl mb-4">🍳</div>
-            <p className="text-lg font-medium text-stone-500">No recipes yet</p>
-            <p className="text-sm mt-1">
-              Paste a recipe URL above to get started
-            </p>
-          </div>
+          <PageEmptyState
+            emoji="🍳"
+            title="No recipes yet"
+            subtitle="Paste a recipe URL above to get started"
+          />
         ) : view === "grid" ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {filteredRecipes.map((recipe) => (
