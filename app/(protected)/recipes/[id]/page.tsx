@@ -1,4 +1,4 @@
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ArrowLeft, ExternalLink, Pencil } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
@@ -24,7 +24,9 @@ export default async function RecipeDetailPage({
   const recipeObj = recipes.find((recipe) => recipe.id === id) as Recipe | undefined;
   if (!recipeObj) notFound();
 
-  const ratingRows = await fetchRatingsForUrl(recipeObj.source_url);
+  const ratingRows = recipeObj.source_url
+    ? await fetchRatingsForUrl(recipeObj.source_url)
+    : [];
 
   const avgRating = ratingRows.length
     ? ratingRows.reduce((sum, row) => sum + row.rating, 0) / ratingRows.length
@@ -41,9 +43,16 @@ export default async function RecipeDetailPage({
           >
             <ArrowLeft size={18} />
           </Link>
-          <span className="font-semibold text-stone-900 truncate">
+          <span className="font-semibold text-stone-900 truncate flex-1">
             {recipeObj.title}
           </span>
+          <Link
+            href={`/recipes/${id}/edit`}
+            className="flex items-center gap-1.5 text-sm text-stone-500 hover:text-stone-700 hover:bg-stone-100 px-3 py-1.5 rounded-lg transition"
+          >
+            <Pencil size={14} />
+            Edit
+          </Link>
         </div>
       </header>
 
@@ -56,27 +65,31 @@ export default async function RecipeDetailPage({
           <h1 className="text-2xl font-bold text-stone-900">
             {recipeObj.title}
           </h1>
-          <a
-            href={recipeObj.source_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-shrink-0 flex items-center gap-1.5 text-sm text-brand-600 hover:text-brand-700 font-medium"
-          >
-            <ExternalLink size={14} />
-            Source
-          </a>
+          {recipeObj.source_url && (
+            <a
+              href={recipeObj.source_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-shrink-0 flex items-center gap-1.5 text-sm text-brand-600 hover:text-brand-700 font-medium"
+            >
+              <ExternalLink size={14} />
+              Source
+            </a>
+          )}
         </div>
 
-        <div className="mb-8">
-          <RecipeRatingWidget
-            sourceUrl={recipeObj.source_url}
-            title={recipeObj.title}
-            imageUrl={recipeObj.image_url}
-            initialAvg={avgRating}
-            initialCount={ratingRows.length}
-            initialUserRating={userRating}
-          />
-        </div>
+        {recipeObj.source_url && (
+          <div className="mb-8">
+            <RecipeRatingWidget
+              sourceUrl={recipeObj.source_url}
+              title={recipeObj.title}
+              imageUrl={recipeObj.image_url}
+              initialAvg={avgRating}
+              initialCount={ratingRows.length}
+              initialUserRating={userRating}
+            />
+          </div>
+        )}
 
         <div className="grid md:grid-cols-2 gap-8">
           <section>

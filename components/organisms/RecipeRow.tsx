@@ -58,15 +58,17 @@ export const RecipeRow = ({ recipe, selected, onToggle, onDelete }: RecipeRowPro
       </div>
 
       <div className="flex items-center gap-1 flex-shrink-0">
-        <a
-          href={recipe.source_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="p-1.5 text-stone-400 hover:text-brand-500 transition"
-          title="View original"
-        >
-          <ExternalLink size={14} />
-        </a>
+        {recipe.source_url && (
+          <a
+            href={recipe.source_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-1.5 text-stone-400 hover:text-brand-500 transition"
+            title="View original"
+          >
+            <ExternalLink size={14} />
+          </a>
+        )}
         <button
           onClick={() => onDelete(recipe.id)}
           className="p-1.5 text-stone-400 hover:text-red-500 transition opacity-0 group-hover:opacity-100"

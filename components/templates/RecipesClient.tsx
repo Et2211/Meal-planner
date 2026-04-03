@@ -135,7 +135,7 @@ export const RecipesClient = ({ initialRecipes, avgRatings }: RecipesClientProps
                 selected={selected.has(recipe.id)}
                 onToggle={toggleSelect}
                 onDelete={handleDelete}
-                avgRating={avgRatings[recipe.source_url] ?? null}
+                avgRating={(recipe.source_url ? avgRatings[recipe.source_url] : null) ?? null}
               />
             ))}
           </div>

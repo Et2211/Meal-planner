@@ -9,7 +9,7 @@ export interface Recipe {
   id: string;
   user_id: string;
   title: string;
-  source_url: string;
+  source_url: string | null;
   image_url: string | null;
   ingredients: Ingredient[];
   instructions: string[];
@@ -18,7 +18,7 @@ export interface Recipe {
 
 export interface ScrapedRecipe {
   title: string;
-  source_url: string;
+  source_url: string | null;
   image_url: string | null;
   ingredients: Ingredient[];
   instructions: string[];
