@@ -5,7 +5,7 @@ create table if not exists public.recipes (
   id          uuid primary key default gen_random_uuid(),
   user_id     uuid not null references auth.users(id) on delete cascade,
   title       text not null,
-  source_url  text not null,
+  source_url  text,
   image_url   text,
   ingredients jsonb not null default '[]'::jsonb,
   instructions jsonb not null default '[]'::jsonb,
@@ -124,3 +124,7 @@ create policy "Users can update own shopping lists"
 create policy "Users can delete own shopping lists"
   on public.shopping_lists for delete
   using (auth.uid() = user_id);
+
+-- Migration: make source_url nullable to support custom (non-URL) recipes
+-- Run this if your recipes table was created with source_url NOT NULL:
+-- ALTER TABLE public.recipes ALTER COLUMN source_url DROP NOT NULL;

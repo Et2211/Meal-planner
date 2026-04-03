@@ -66,15 +66,17 @@ export const RecipeCard = ({
             {recipe.ingredients.length} ingredient
             {recipe.ingredients.length !== 1 ? "s" : ""}
           </span>
-          <a
-            href={recipe.source_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-stone-400 hover:text-brand-500 transition"
-            title="View original"
-          >
-            <ExternalLink size={13} />
-          </a>
+          {recipe.source_url && (
+            <a
+              href={recipe.source_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-stone-400 hover:text-brand-500 transition"
+              title="View original"
+            >
+              <ExternalLink size={13} />
+            </a>
+          )}
         </div>
         {avgRating && (
           <div className="flex items-center gap-1 mt-1.5">

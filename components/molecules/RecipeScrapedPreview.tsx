@@ -26,6 +26,7 @@ export const RecipeScrapedPreview = ({
   const [ratingInfo, setRatingInfo] = useState<RatingInfo | null>(null);
 
   useEffect(() => {
+    if (!recipe.source_url) return;
     async function fetchRating() {
       const supabase = createClient();
       const { data } = await supabase
