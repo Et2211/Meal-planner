@@ -101,7 +101,7 @@ export const Navbar = ({ selectedCount, onShoppingListClick }: NavbarProps) => {
             </Link>
           )}
           <button
-            onClick={() => setMenuOpen((o) => !o)}
+            onClick={() => setMenuOpen((prev) => !prev)}
             className="p-2 text-stone-500 hover:text-stone-700 hover:bg-stone-100 rounded-lg transition"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
           >

@@ -4,9 +4,9 @@ import { Loader2 } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/atoms/Button";
+import { ErrorAlert } from "@/components/atoms/ErrorAlert";
 import { FormField } from "@/components/molecules/FormField";
 import { createClient } from "@/lib/supabase/client";
-import { cn } from "@/lib/utils";
 
 type Mode = "login" | "signup";
 
@@ -104,18 +104,10 @@ export const LoginForm = () => {
           placeholder="••••••••"
         />
 
-        {message && (
-          <p
-            className={cn(
-              "text-sm px-3 py-2 rounded-lg",
-              message.type === "error"
-                ? "bg-red-50 text-red-600"
-                : "bg-green-50 text-green-700"
-            )}
-          >
-            {message.text}
-          </p>
-        )}
+        <ErrorAlert
+          message={message?.text}
+          variant={message?.type === "success" ? "success" : "error"}
+        />
 
         <Button
           type="submit"

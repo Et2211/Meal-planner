@@ -2,16 +2,19 @@
 
 import { useEffect, useState } from "react";
 
+import { PageEmptyState } from "@/components/atoms/PageEmptyState";
 import { ShoppingListCustomInput } from "@/components/atoms/ShoppingListCustomInput";
-import { ShoppingListEmptyState } from "@/components/atoms/ShoppingListEmptyState";
 import { ShoppingListEntries } from "@/components/atoms/ShoppingListEntries";
 import { ShoppingListHeader } from "@/components/atoms/ShoppingListHeader";
 import { ShoppingListRecipeBadges } from "@/components/atoms/ShoppingListRecipeBadges";
 import { Spinner } from "@/components/atoms/Spinner";
 import { revalidateUserShoppingLists } from "@/lib/actions/revalidate";
+import { useCopyToClipboard } from "@/lib/hooks/useCopyToClipboard";
+import { useShoppingListSave } from "@/lib/hooks/useShoppingListSave";
 import { buildShoppingList, formatShoppingItem } from "@/lib/ingredient-parser";
 import { createClient } from "@/lib/supabase/client";
 import type { Recipe } from "@/lib/types";
+import { formatDate } from "@/lib/utils/formatDate";
 
 interface ListEntry {
   id: string;
@@ -21,20 +24,15 @@ interface ListEntry {
 }
 
 export const ShoppingList = () => {
-  const today = new Date().toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-  });
-  const [listName, setListName] = useState(`Shopping List · ${today}`);
+  const [listName, setListName] = useState(`Shopping List · ${formatDate(new Date())}`);
   const [entries, setEntries] = useState<ListEntry[]>([]);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [recipeIds, setRecipeIds] = useState<string[]>([]);
   const [customInput, setCustomInput] = useState("");
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [savedId, setSavedId] = useState<string | null>(null);
-  const [saveFeedback, setSaveFeedback] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const { saving, saveFeedback, withSave } = useShoppingListSave();
+  const { copied, copy } = useCopyToClipboard();
 
   useEffect(() => {
     async function load() {
@@ -102,63 +100,42 @@ export const ShoppingList = () => {
   }
 
   async function handleSave() {
-    setSaving(true);
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) {
-      setSaving(false);
-      return;
-    }
-    const payload = {
-      user_id: user.id,
-      name: listName,
-      items: entries.map(({ label, checked, custom }) => ({
-        label,
-        checked,
-        custom,
-      })),
-      recipe_ids: recipeIds,
-    };
+    await withSave(async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
 
-    if (savedId) {
-      const { error } = await supabase
-        .from("shopping_lists")
-        .update(payload)
-        .eq("id", savedId);
-      if (error) {
-        // eslint-disable-next-line no-console
-        console.error("shopping_lists update failed:", error.message);
-        setSaving(false);
-        return;
-      }
-    } else {
-      const { data, error } = await supabase
-        .from("shopping_lists")
-        .insert(payload)
-        .select("id")
-        .single();
-      if (error) {
-        // eslint-disable-next-line no-console
-        console.error("shopping_lists insert failed:", error.message);
-        setSaving(false);
-        return;
-      }
-      if (data) setSavedId(data.id as string);
-    }
+      const payload = {
+        user_id: user.id,
+        name: listName,
+        items: entries.map(({ label, checked, custom }) => ({ label, checked, custom })),
+        recipe_ids: recipeIds,
+      };
 
-    await revalidateUserShoppingLists(user.id);
-    setSaving(false);
-    setSaveFeedback(true);
-    setTimeout(() => setSaveFeedback(false), 2000);
+      if (savedId) {
+        const { error } = await supabase.from("shopping_lists").update(payload).eq("id", savedId);
+        if (error) {
+          // eslint-disable-next-line no-console
+          console.error("shopping_lists update failed:", error.message);
+          return;
+        }
+      } else {
+        const { data, error } = await supabase.from("shopping_lists").insert(payload).select("id").single();
+        if (error) {
+          // eslint-disable-next-line no-console
+          console.error("shopping_lists insert failed:", error.message);
+          return;
+        }
+        if (data) setSavedId(data.id as string);
+      }
+
+      await revalidateUserShoppingLists(user.id);
+    });
   }
 
-  async function handleCopy() {
+  function handleCopy() {
     const text = entries.map((entry) => `- ${entry.label}`).join("\n");
-    await navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    copy(text);
   }
 
   if (loading) {
@@ -184,7 +161,13 @@ export const ShoppingList = () => {
 
       <main className="max-w-2xl mx-auto px-4 py-8">
         {entries.length === 0 ? (
-          <ShoppingListEmptyState />
+          <PageEmptyState
+            emoji="🛒"
+            title="No recipes selected"
+            subtitle="Go back and check some recipes first"
+            ctaHref="/recipes"
+            ctaLabel="Back to recipes"
+          />
         ) : (
           <>
             <ShoppingListRecipeBadges recipes={recipes} />

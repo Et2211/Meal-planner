@@ -11,6 +11,8 @@ import { Input } from "@/components/atoms/Input";
 import { RoundCheckbox } from "@/components/atoms/RoundCheckbox";
 import { Spinner } from "@/components/atoms/Spinner";
 import { revalidateShoppingList, revalidateUserShoppingLists } from "@/lib/actions/revalidate";
+import { useCopyToClipboard } from "@/lib/hooks/useCopyToClipboard";
+import { useShoppingListSave } from "@/lib/hooks/useShoppingListSave";
 import { createClient } from "@/lib/supabase/client";
 import type { SavedListItem, SavedShoppingList } from "@/lib/types";
 
@@ -23,10 +25,9 @@ export const SavedShoppingListView = ({ list }: Props) => {
   const [listName, setListName] = useState(list.name);
   const [items, setItems] = useState<SavedListItem[]>(list.items);
   const [customInput, setCustomInput] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [saveFeedback, setSaveFeedback] = useState(false);
-  const [copied, setCopied] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const { saving, saveFeedback, withSave } = useShoppingListSave();
+  const { copied, copy } = useCopyToClipboard();
 
   function toggleItem(index: number) {
     setItems((prev) => prev.map((item, idx) => idx === index ? { ...item, checked: !item.checked } : item));
@@ -44,14 +45,12 @@ export const SavedShoppingListView = ({ list }: Props) => {
   }
 
   async function handleSave() {
-    setSaving(true);
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    await supabase.from("shopping_lists").update({ name: listName, items }).eq("id", list.id);
-    if (user) await revalidateShoppingList(list.id, user.id);
-    setSaving(false);
-    setSaveFeedback(true);
-    setTimeout(() => setSaveFeedback(false), 2000);
+    await withSave(async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      await supabase.from("shopping_lists").update({ name: listName, items }).eq("id", list.id);
+      if (user) await revalidateShoppingList(list.id, user.id);
+    });
   }
 
   async function handleDelete() {
@@ -64,11 +63,9 @@ export const SavedShoppingListView = ({ list }: Props) => {
     router.push("/shopping-lists");
   }
 
-  async function handleCopy() {
+  function handleCopy() {
     const text = items.map((item) => `${item.checked ? "✓" : "-"} ${item.label}`).join("\n");
-    await navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    copy(text);
   }
 
   return (

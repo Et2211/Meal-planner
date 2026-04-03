@@ -4,6 +4,7 @@ import { Link as LinkIcon, Loader2, Pencil, Plus } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/atoms/Button";
+import { ErrorAlert } from "@/components/atoms/ErrorAlert";
 import { Input } from "@/components/atoms/Input";
 import { RecipeScrapedPreview } from "@/components/molecules/RecipeScrapedPreview";
 import { RecipeEditor, type RecipePayload } from "@/components/organisms/RecipeEditor";
@@ -175,9 +176,7 @@ export const AddRecipeForm = ({ onAdded }: AddRecipeFormProps) => {
             </Button>
           </form>
 
-          {error && (
-            <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{error}</p>
-          )}
+          <ErrorAlert message={error} />
 
           {(step === "preview" || step === "saving") && scraped && (
             <RecipeScrapedPreview
@@ -193,9 +192,7 @@ export const AddRecipeForm = ({ onAdded }: AddRecipeFormProps) => {
       {/* Custom recipe mode */}
       {mode === "custom" && (
         <div className="bg-white border border-stone-200 rounded-2xl p-5 overflow-hidden">
-          {customError && (
-            <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg mb-4">{customError}</p>
-          )}
+          <ErrorAlert message={customError} className="mb-4" />
           <RecipeEditor
             isSaving={isSavingCustom}
             onSave={handleSaveCustom}

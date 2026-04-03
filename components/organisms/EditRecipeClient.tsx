@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { ErrorAlert } from "@/components/atoms/ErrorAlert";
 import { RecipeEditor, type RecipePayload } from "@/components/organisms/RecipeEditor";
 import { revalidateRecipe } from "@/lib/actions/revalidate";
 import { createClient } from "@/lib/supabase/client";
@@ -12,7 +13,7 @@ interface EditRecipeClientProps {
   recipe: Recipe;
 }
 
-export function EditRecipeClient({ recipe }: EditRecipeClientProps) {
+export const EditRecipeClient = ({ recipe }: EditRecipeClientProps) => {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -47,9 +48,7 @@ export function EditRecipeClient({ recipe }: EditRecipeClientProps) {
 
   return (
     <div className="overflow-hidden">
-      {error && (
-        <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg mb-4">{error}</p>
-      )}
+      <ErrorAlert message={error} className="mb-4" />
       <RecipeEditor
         initial={{
           title: recipe.title,

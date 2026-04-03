@@ -19,9 +19,9 @@ interface IngredientEditorProps {
 
 export function rowsToIngredients(rows: IngredientRow[]): Ingredient[] {
   return rows
-    .filter((r) => r.name.trim())
-    .map((r) => {
-      const raw = [r.quantity.trim(), r.unit.trim(), r.name.trim()]
+    .filter((row) => row.name.trim())
+    .map((row) => {
+      const raw = [row.quantity.trim(), row.unit.trim(), row.name.trim()]
         .filter(Boolean)
         .join(" ");
       return parseIngredient(raw);
@@ -42,9 +42,9 @@ export function ingredientsToRows(ingredients: Ingredient[]): IngredientRow[] {
   }));
 }
 
-export function IngredientEditor({ value, onChange }: IngredientEditorProps) {
+export const IngredientEditor = ({ value, onChange }: IngredientEditorProps) => {
   function update(id: string, field: keyof Omit<IngredientRow, "id">, val: string) {
-    onChange(value.map((r) => (r.id === id ? { ...r, [field]: val } : r)));
+    onChange(value.map((row) => (row.id === id ? { ...row, [field]: val } : row)));
   }
 
   function add() {
@@ -52,7 +52,7 @@ export function IngredientEditor({ value, onChange }: IngredientEditorProps) {
   }
 
   function remove(id: string) {
-    const next = value.filter((r) => r.id !== id);
+    const next = value.filter((row) => row.id !== id);
     onChange(next.length ? next : [newRow()]);
   }
 

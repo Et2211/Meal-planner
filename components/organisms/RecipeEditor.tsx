@@ -4,13 +4,13 @@ import { Loader2, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/atoms/Button";
+import { FormField } from "@/components/molecules/FormField";
 import {
   IngredientEditor,
+  type IngredientRow,
   ingredientsToRows,
   rowsToIngredients,
-  type IngredientRow,
 } from "@/components/molecules/IngredientEditor";
-import { FormField } from "@/components/molecules/FormField";
 import type { Ingredient } from "@/lib/types";
 
 export interface RecipePayload {
@@ -33,7 +33,7 @@ interface RecipeEditorProps {
   isSaving: boolean;
 }
 
-export function RecipeEditor({ initial, onSave, onCancel, isSaving }: RecipeEditorProps) {
+export const RecipeEditor = ({ initial, onSave, onCancel, isSaving }: RecipeEditorProps) => {
   const [title, setTitle] = useState(initial?.title ?? "");
   const [imageUrl, setImageUrl] = useState(initial?.image_url ?? "");
   const [ingredientRows, setIngredientRows] = useState<IngredientRow[]>(() =>
@@ -44,7 +44,7 @@ export function RecipeEditor({ initial, onSave, onCancel, isSaving }: RecipeEdit
   );
 
   function updateInstruction(idx: number, val: string) {
-    setInstructions((prev) => prev.map((s, i) => (i === idx ? val : s)));
+    setInstructions((prev) => prev.map((step, index) => (index === idx ? val : step)));
   }
 
   function addInstruction() {
@@ -53,7 +53,7 @@ export function RecipeEditor({ initial, onSave, onCancel, isSaving }: RecipeEdit
 
   function removeInstruction(idx: number) {
     setInstructions((prev) => {
-      const next = prev.filter((_, i) => i !== idx);
+      const next = prev.filter((_, index) => index !== idx);
       return next.length ? next : [""];
     });
   }
@@ -65,7 +65,7 @@ export function RecipeEditor({ initial, onSave, onCancel, isSaving }: RecipeEdit
       source_url: null,
       image_url: imageUrl.trim() || null,
       ingredients: rowsToIngredients(ingredientRows),
-      instructions: instructions.map((s) => s.trim()).filter(Boolean),
+      instructions: instructions.map((step) => step.trim()).filter(Boolean),
     });
   }
 
