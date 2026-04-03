@@ -110,36 +110,42 @@ export const Navbar = ({ selectedCount, onShoppingListClick }: NavbarProps) => {
         </div>
       </div>
 
-      {/* Mobile dropdown menu */}
-      {menuOpen && (
-        <div className="sm:hidden border-t border-stone-100 bg-white">
-          <nav className="max-w-6xl mx-auto px-4 py-2 flex flex-col">
-            <Link
-              href="/top-rated"
-              onClick={closeMenu}
-              className="flex items-center gap-3 px-3 py-3 text-stone-700 hover:bg-stone-50 rounded-lg transition"
-            >
-              <Star size={18} className="text-stone-400" />
-              Top rated
-            </Link>
-            <Link
-              href="/shopping-lists"
-              onClick={closeMenu}
-              className="flex items-center gap-3 px-3 py-3 text-stone-700 hover:bg-stone-50 rounded-lg transition"
-            >
-              <ClipboardList size={18} className="text-stone-400" />
-              Saved shopping lists
-            </Link>
-            <button
-              onClick={() => { closeMenu(); handleSignOut(); }}
-              className="flex items-center gap-3 px-3 py-3 text-stone-700 hover:bg-stone-50 rounded-lg transition text-left"
-            >
-              <LogOut size={18} className="text-stone-400" />
-              Sign out
-            </button>
-          </nav>
+      {/* Mobile dropdown menu — always mounted, animated via grid-rows */}
+      <div
+        className={`sm:hidden grid transition-[grid-template-rows] duration-200 ease-in-out ${
+          menuOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+        }`}
+      >
+        <div className="overflow-hidden">
+          <div className="border-t border-stone-100 bg-white">
+            <nav className="max-w-6xl mx-auto px-4 py-2 flex flex-col">
+              <Link
+                href="/top-rated"
+                onClick={closeMenu}
+                className="flex items-center gap-3 px-3 py-3 text-stone-700 hover:bg-stone-50 rounded-lg transition"
+              >
+                <Star size={18} className="text-stone-400" />
+                Top rated
+              </Link>
+              <Link
+                href="/shopping-lists"
+                onClick={closeMenu}
+                className="flex items-center gap-3 px-3 py-3 text-stone-700 hover:bg-stone-50 rounded-lg transition"
+              >
+                <ClipboardList size={18} className="text-stone-400" />
+                Saved shopping lists
+              </Link>
+              <button
+                onClick={() => { closeMenu(); handleSignOut(); }}
+                className="flex items-center gap-3 px-3 py-3 text-stone-700 hover:bg-stone-50 rounded-lg transition text-left"
+              >
+                <LogOut size={18} className="text-stone-400" />
+                Sign out
+              </button>
+            </nav>
+          </div>
         </div>
-      )}
+      </div>
     </header>
   );
 };
