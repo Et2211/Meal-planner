@@ -91,7 +91,7 @@ export function RecipeEditor({ initial, onSave, onCancel, isSaving }: RecipeEdit
         <p className="block text-sm font-medium text-stone-700 mb-2">
           Ingredients
         </p>
-        <div className="text-xs text-stone-400 mb-2">
+        <div className="text-xs text-stone-400 mb-2 break-words">
           Quantities are converted to metric automatically (e.g. 1 cup → 240 ml)
         </div>
         <IngredientEditor value={ingredientRows} onChange={setIngredientRows} />

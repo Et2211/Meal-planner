@@ -192,7 +192,7 @@ export const AddRecipeForm = ({ onAdded }: AddRecipeFormProps) => {
 
       {/* Custom recipe mode */}
       {mode === "custom" && (
-        <div className="bg-white border border-stone-200 rounded-2xl p-5">
+        <div className="bg-white border border-stone-200 rounded-2xl p-5 overflow-hidden">
           {customError && (
             <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg mb-4">{customError}</p>
           )}

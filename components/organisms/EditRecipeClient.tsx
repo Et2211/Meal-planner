@@ -46,7 +46,7 @@ export function EditRecipeClient({ recipe }: EditRecipeClientProps) {
   }
 
   return (
-    <div>
+    <div className="overflow-hidden">
       {error && (
         <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg mb-4">{error}</p>
       )}

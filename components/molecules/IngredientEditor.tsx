@@ -67,7 +67,7 @@ export function IngredientEditor({ value, onChange }: IngredientEditorProps) {
             onChange={(e) => update(row.id, "quantity", e.target.value)}
             placeholder="Qty"
             aria-label={`Ingredient ${idx + 1} quantity`}
-            className="w-16 px-2 py-2 border border-stone-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+            className="w-12 sm:w-16 px-2 py-2 border border-stone-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
           />
           <input
             type="text"
@@ -75,7 +75,7 @@ export function IngredientEditor({ value, onChange }: IngredientEditorProps) {
             onChange={(e) => update(row.id, "unit", e.target.value)}
             placeholder="Unit"
             aria-label={`Ingredient ${idx + 1} unit`}
-            className="w-20 px-2 py-2 border border-stone-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+            className="w-14 sm:w-20 px-2 py-2 border border-stone-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
           />
           <input
             type="text"
@@ -83,7 +83,7 @@ export function IngredientEditor({ value, onChange }: IngredientEditorProps) {
             onChange={(e) => update(row.id, "name", e.target.value)}
             placeholder="Ingredient name"
             aria-label={`Ingredient ${idx + 1} name`}
-            className="flex-1 px-2 py-2 border border-stone-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+            className="min-w-0 flex-1 px-2 py-2 border border-stone-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
           />
           <button
             type="button"
